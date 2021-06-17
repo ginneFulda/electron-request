@@ -2,7 +2,7 @@
 
 import type { Blob } from '../typings.d';
 
-class BlobImplement implements Blob {
+class BlobImpl implements Blob {
   private buffer: Buffer;
   private closed: boolean;
   private privateType: string = '';
@@ -28,7 +28,7 @@ class BlobImplement implements Blob {
           buf = part;
         } else if (part instanceof ArrayBuffer) {
           buf = Buffer.from(new Uint8Array(part));
-        } else if (part instanceof BlobImplement) {
+        } else if (part instanceof BlobImpl) {
           buf = part.buffer;
         } else if (ArrayBuffer.isView(part)) {
           buf = Buffer.from(new Uint8Array(part.buffer, part.byteOffset, part.byteLength));
@@ -85,7 +85,7 @@ class BlobImplement implements Blob {
     }
     const span = Math.max(relativeEnd - relativeStart, 0);
     const slicedBuffer = buffer.slice(relativeStart, relativeStart + span);
-    const blob = new BlobImplement([], { type: type || this.type });
+    const blob = new BlobImpl([], { type: type || this.type });
     blob.buffer = slicedBuffer;
     blob.closed = this.closed;
     return blob;
@@ -100,4 +100,4 @@ class BlobImplement implements Blob {
   }
 }
 
-export default BlobImplement;
+export default BlobImpl;

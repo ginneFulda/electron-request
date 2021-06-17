@@ -2,7 +2,7 @@ import zlib from 'zlib';
 import { URL } from 'url';
 import { PassThrough } from 'stream';
 import { isRedirect } from '../utils';
-import ResponseImplement from '../Response';
+import ResponseImpl from '../Response';
 import Headers from '../Headers';
 import { HEADER_MAP, METHOD_MAP } from '../enum';
 import type { RequestOptions, Response } from '../typings.d';
@@ -100,7 +100,7 @@ abstract class RequestClient {
           };
 
           const resolveResponse = (body: PassThrough) => {
-            const response = new ResponseImplement(body, responseOptions);
+            const response = new ResponseImpl(body, responseOptions);
             resolve(response);
           };
 
