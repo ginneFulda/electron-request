@@ -141,7 +141,7 @@ export default class implements Response {
       if (typeof onProgress === 'function') {
         const contentLength = Number(this.headers.get(HEADER_MAP.CONTENT_LENGTH));
         const progressStream = new ProgressCallbackTransform(contentLength, onProgress);
-        feedStreams.push(progressStream);
+        feedStreams.unshift(progressStream);
       }
       dest.once('finish', () => {
         dest.close();
@@ -171,43 +171,43 @@ export default class implements Response {
   /**
    * Decode response as ArrayBuffer
    */
-  get arrayBuffer(): Promise<ArrayBuffer> {
-    return this.consumeResponse().then((buf) =>
-      buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
-    );
-  }
+  arrayBuffer = async (): Promise<ArrayBuffer> => {
+    const buf = await this.consumeResponse();
+    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+  };
 
   /**
    * Decode response as Blob
    */
-  get blob(): Promise<Blob> {
+  blob = async (): Promise<Blob> => {
     const contentType = (this.headers && this.headers.get(HEADER_MAP.CONTENT_TYPE)) || '';
-    return this.consumeResponse().then((buffer) => {
-      const blob = new Blob([buffer], {
-        type: contentType.toLowerCase(),
-      });
-      return blob;
+    const buffer = await this.consumeResponse();
+    const blob = new Blob([buffer], {
+      type: contentType.toLowerCase(),
     });
-  }
+    return blob;
+  };
 
   /**
    * Decode response as text
    */
-  get text(): Promise<string> {
-    return this.consumeResponse().then((buffer) => buffer.toString());
-  }
+  text = async (): Promise<string> => {
+    const buffer = await this.consumeResponse();
+    return buffer.toString();
+  };
 
   /**
    * Decode response as json
    */
-  get json(): Promise<string> {
-    return this.consumeResponse().then((buffer) => JSON.parse(buffer.toString()));
-  }
+  json = async <T>(): Promise<T> => {
+    const buffer = await this.consumeResponse();
+    return JSON.parse(buffer.toString());
+  };
 
   /**
    * Decode response as buffer
    */
-  get buffer(): Promise<Buffer> {
+  buffer = (): Promise<Buffer> => {
     return this.consumeResponse();
-  }
+  };
 }

@@ -86,15 +86,15 @@ export interface Response {
    */
   download: (dest: WriteStream, onProgress?: ProgressCallback) => Promise<void>;
   /** Decode response as ArrayBuffer */
-  arrayBuffer: Promise<ArrayBuffer>;
+  arrayBuffer(): Promise<ArrayBuffer>;
   /** Decode response as Blob */
-  blob: Promise<Blob>;
+  blob(): Promise<Blob>;
   /** Decode response as text */
-  text: Promise<string>;
+  text(): Promise<string>;
   /** Decode response as json */
-  json: Promise<string>;
+  json<T>(): Promise<T>;
   /** Decode response as buffer */
-  buffer: Promise<Buffer>;
+  buffer(): Promise<Buffer>;
 }
 
 export interface DefaultOptions {
