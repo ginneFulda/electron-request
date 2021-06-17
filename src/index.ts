@@ -6,4 +6,6 @@ const main = (requestURL: string, options: Options = {}): Promise<Response> => {
   return request.send();
 };
 
+export type { ProgressInfo } from './typings.d';
+
 export default main;
