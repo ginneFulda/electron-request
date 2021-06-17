@@ -1,0 +1,55 @@
+{
+  "name": "electron-request",
+  "version": "1.0.0",
+  "description": "Zero-dependency, lightweight http request client in electron or nodejs",
+  "keywords": [
+    "http",
+    "https",
+    "electron",
+    "nodejs",
+    "request",
+    "curl",
+    "fetch",
+    "net",
+    "network",
+    "gzip"
+  ],
+  "homepage": "https://github.com/islizeqiang/electron-request#readme",
+  "bugs": {
+    "url": "https://github.com/islizeqiang/electron-request/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/islizeqiang/electron-request.git"
+  },
+  "license": "MIT",
+  "author": "islizeqiang",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "siroc build --watch",
+    "build": "siroc build",
+    "release": "npm run build && standard-version && git push --follow-tags && npm publish",
+    "prepublishOnly": "pinst --disable",
+    "postpublish": "pinst --enable",
+    "postinstall": "husky install"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,vue}": "eslint --ext .js,.ts",
+    "**/*.{js,ts,md,json}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "code-fabric": "^1.4.1",
+    "husky": "^6.0.0",
+    "lint-staged": "^11.0.0",
+    "pinst": "^2.1.6",
+    "siroc": "^0.11.0",
+    "standard-version": "^9.3.0"
+  }
+}
