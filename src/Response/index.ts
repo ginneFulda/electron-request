@@ -201,7 +201,13 @@ export default class implements Response {
    */
   json = async <T>(): Promise<T> => {
     const buffer = await this.consumeResponse();
-    return JSON.parse(buffer.toString());
+    let result: T;
+    try {
+      result = JSON.parse(buffer.toString());
+    } catch {
+      result = buffer.toString() as unknown as T;
+    }
+    return result;
   };
 
   /**
