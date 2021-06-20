@@ -66,8 +66,7 @@ class Request {
     this.client = inElectron ? new ElectronRequest(options) : new NativeRequest(options);
   }
 
-  public send = async () => {
-    await this.client.createClientRequest();
+  public send = () => {
     return this.client.send();
   };
 }

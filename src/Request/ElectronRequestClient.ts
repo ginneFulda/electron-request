@@ -55,9 +55,9 @@ class ElectronRequestClient extends RequestClient {
   };
 
   public bindPrivateEvent = (reject: PromiseReject) => {
+    if (!this.clientRequest) return;
     const { username, password } = this.options;
-
-    this.clientRequest?.on('login', (authInfo, callback) => {
+    this.clientRequest.on('login', (authInfo, callback) => {
       if (username && password) {
         callback(username, password);
       } else {

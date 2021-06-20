@@ -27,8 +27,9 @@ abstract class RequestClient {
     this.timeoutId = null;
   };
 
-  public send = (): Promise<Response> => {
-    return new Promise((resolve, reject) => {
+  public send = async (): Promise<Response> => {
+    await this.createClientRequest();
+    return await new Promise((resolve, reject) => {
       if (this.clientRequest) {
         const {
           method,
@@ -139,7 +140,7 @@ abstract class RequestClient {
 
         this.clientRequest.end();
       } else {
-        reject(new Error('Please create client request first'));
+        throw new Error('Please create client request first');
       }
     });
   };
