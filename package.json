@@ -33,7 +33,7 @@
   "scripts": {
     "start": "siroc build --watch",
     "build": "siroc build",
-    "release": "npm run build && standard-version && git push --follow-tags && npm publish",
+    "release": "npm run build && standard-version",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
     "postinstall": "husky install"
