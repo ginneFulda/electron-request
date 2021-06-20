@@ -1,24 +1,24 @@
-English | [简体中文](./README.zh-CN.md)
+[English](./README.md) | 简体中文
 
 # electron-request
 
-> Zero-dependency, Lightweight HTTP request client for Electron or Node.js
+> 在 Electron 或 Node.js 环境下使用的轻量的零依赖的 http 请求库
 
-## Why electron-request ?
+## 为什么
 
-Electron-request uses its built-in net module in Electron environment and uses its built-in HTTP module in Node.js environment.
+electron-request 在 Electron 环境下使用其内置的 net 模块，在 Node.js 环境下使用其内置的 HTTP 模块。
 
-Net module is used in electron to better support proxy, authentication, traffic monitoring proxies and other features. Please refer to [net](https://www.electronjs.org/docs/api/net) for details.
+在 Electron 中使用 net 模块，更好的支持代理、身份验证、流量监控等功能。详细可查看[net 文档](https://www.electronjs.org/docs/api/net)。
 
-## Features
+## 特性
 
-- Zero-dependency, Lightweight
-- Quick start, similar window.fetch
-- No need to import other libraries, support file download progress
-- Support to run on Electron or Node.js, use Electron's net module first
-- Unified error handling
+- 零依赖，足够轻量
+- 快速上手，类似 window.fetch 的使用方式
+- 不需要引入额外库，支持文件下载进度功能
+- 支持在 Electron 或 Node.js 上运行，优先使用 Electron 的 net 模块
+- 统一的错误处理
 
-## Install
+## 安装
 
 ```bash
 npm install electron-request --save
@@ -26,7 +26,7 @@ npm install electron-request --save
 yarn add electron-request
 ```
 
-## Usage
+## 使用
 
 ```ts
 import request from 'electron-request';
@@ -50,9 +50,9 @@ void (async () => {
 
 ### request(url[, options])
 
-- url: Request URL
+- url：请求地址
 
-- options: Options
+- options：配置项
 
   ```ts
   interface Options {
