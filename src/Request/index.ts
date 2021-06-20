@@ -11,7 +11,7 @@ import type { RequestConstructorOptions, RequestOptions } from '../typings.d';
 const getRequestOptions = (constructorOptions: RequestConstructorOptions): RequestOptions => {
   const options = { ...DEFAULT_OPTIONS, ...constructorOptions };
 
-  const { method, body, requestURL, headers: headerOptions } = options;
+  const { method, body, requestURL, query, headers: headerOptions } = options;
 
   if (body !== null && (method === METHOD_MAP.GET || method === METHOD_MAP.HEAD)) {
     throw new TypeError('Request with GET/HEAD method cannot have body');
@@ -23,6 +23,11 @@ const getRequestOptions = (constructorOptions: RequestConstructorOptions): Reque
   }
   if (!/^https?:$/.test(parsedURL.protocol)) {
     throw new TypeError('Only HTTP(S) protocols are supported');
+  }
+  if (query) {
+    for (const [queryKey, queryValue] of Object.entries(query)) {
+      parsedURL.searchParams.append(queryKey, queryValue);
+    }
   }
 
   const headers = new Headers(headerOptions);

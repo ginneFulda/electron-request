@@ -4,7 +4,7 @@ import type { PromiseReject } from './RequestClient';
 import type { ElectronClientRequest } from './ElectronAdapter';
 import type { RequestOptions } from '../typings.d';
 
-class ElectronRequest extends RequestClient {
+class ElectronRequestClient extends RequestClient {
   private readonly electronAdapter = new ElectronAdapter();
   public clientRequest: ElectronClientRequest | null = null;
   public options: RequestOptions;
@@ -19,7 +19,7 @@ class ElectronRequest extends RequestClient {
     await this.electronAdapter.whenReady();
     const {
       requestURL,
-      parsedURL: { protocol, host, hostname, port, pathname, origin },
+      parsedURL: { protocol, host, hostname, port, pathname, origin, search },
       method,
       session,
       useSessionCookies,
@@ -36,7 +36,7 @@ class ElectronRequest extends RequestClient {
       hostname,
       origin,
       port: Number(port),
-      path: pathname,
+      path: `${pathname}${search || ''}`,
     });
 
     for (const [key, headerValues] of Object.entries(headers.raw())) {
@@ -68,4 +68,4 @@ class ElectronRequest extends RequestClient {
   };
 }
 
-export default ElectronRequest;
+export default ElectronRequestClient;

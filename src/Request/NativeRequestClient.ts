@@ -13,7 +13,7 @@ const adapterForHttp = (protocol: string) => {
   throw new TypeError('Only HTTP(S) protocols are supported');
 };
 
-class NativeRequest extends RequestClient {
+class NativeRequestClient extends RequestClient {
   public clientRequest: http.ClientRequest | null = null;
   public options: RequestOptions;
   public requiredDecode: boolean = true;
@@ -25,7 +25,7 @@ class NativeRequest extends RequestClient {
 
   public createClientRequest = async () => {
     const {
-      parsedURL: { protocol, host, hostname, port, pathname },
+      parsedURL: { protocol, host, hostname, port, pathname, search },
       headers,
       method,
     } = this.options;
@@ -34,7 +34,7 @@ class NativeRequest extends RequestClient {
       host,
       hostname,
       port,
-      path: pathname,
+      path: `${pathname}${search || ''}`,
       headers: headers.raw(),
       method,
     });
@@ -51,4 +51,4 @@ class NativeRequest extends RequestClient {
   public bindPrivateEvent = () => {};
 }
 
-export default NativeRequest;
+export default NativeRequestClient;
