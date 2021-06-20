@@ -53,6 +53,7 @@ const getRequestOptions = (constructorOptions: RequestConstructorOptions): Reque
 
   return {
     ...options,
+    method: method.toUpperCase(),
     parsedURL,
     headers,
   };
