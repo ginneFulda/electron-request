@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/islizeqiang/electron-request/compare/v1.1.0...v1.2.0) (2021-06-20)
+
+### Features
+
+- export type Response ([e6c1c1a](https://github.com/islizeqiang/electron-request/commit/e6c1c1aa40dc93eefd882cdeb563f0746d8ee1ac))
+- handle response.json() error ([8ed28f9](https://github.com/islizeqiang/electron-request/commit/8ed28f90b90dc1943002231660ab31a91fdf16f3))
+- support url query param ([363ab3b](https://github.com/islizeqiang/electron-request/commit/363ab3b7a0817a796576afee8403cf1d8fd13c8d))
+
 ## 1.1.0 (2021-06-17)
 
 ### Features

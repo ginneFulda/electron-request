@@ -1,6 +1,6 @@
 {
   "name": "electron-request",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Zero-dependency, lightweight http request client for electron or nodejs",
   "keywords": [
     "http",
