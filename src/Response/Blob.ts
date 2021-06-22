@@ -66,7 +66,7 @@ class BlobImpl implements Blob {
 
   public slice(start?: number, end?: number, type?: string) {
     const { size, buffer } = this;
-    console.log();
+
     let relativeStart: number;
     let relativeEnd: number;
     if (start === void 0) {
