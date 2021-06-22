@@ -3087,6 +3087,11 @@ fs.realpath@^1.0.0:
   resolved "https://registry.nlark.com/fs.realpath/download/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
   integrity sha1-FQStJSMVjKpA20onh8sBQRmU6k8=
 
+fsevents@~2.3.2:
+  version "2.3.2"
+  resolved "https://registry.nlark.com/fsevents/download/fsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
+  integrity sha1-ilJveLj99GI7cJ4Ll1xSwkwC/Ro=
+
 function-bind@^1.1.1:
   version "1.1.1"
   resolved "https://registry.nlark.com/function-bind/download/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
@@ -4263,7 +4268,7 @@ mdast-util-compact@^1.0.0:
 
 mdast-util-from-markdown@^0.8.0, mdast-util-from-markdown@^0.8.5:
   version "0.8.5"
-  resolved "https://registry.nlark.com/mdast-util-from-markdown/download/mdast-util-from-markdown-0.8.5.tgz?cache=0&sync_timestamp=1624202701383&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fmdast-util-from-markdown%2Fdownload%2Fmdast-util-from-markdown-0.8.5.tgz#d1ef2ca42bc377ecb0463a987910dae89bd9a28c"
+  resolved "https://registry.nlark.com/mdast-util-from-markdown/download/mdast-util-from-markdown-0.8.5.tgz#d1ef2ca42bc377ecb0463a987910dae89bd9a28c"
   integrity sha1-0e8spCvDd+ywRjqYeRDa6JvZoow=
   dependencies:
     "@types/mdast" "^3.0.0"
@@ -4274,7 +4279,7 @@ mdast-util-from-markdown@^0.8.0, mdast-util-from-markdown@^0.8.5:
 
 mdast-util-to-markdown@^0.6.0:
   version "0.6.5"
-  resolved "https://registry.nlark.com/mdast-util-to-markdown/download/mdast-util-to-markdown-0.6.5.tgz?cache=0&sync_timestamp=1624202561125&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fmdast-util-to-markdown%2Fdownload%2Fmdast-util-to-markdown-0.6.5.tgz#b33f67ca820d69e6cc527a93d4039249b504bebe"
+  resolved "https://registry.nlark.com/mdast-util-to-markdown/download/mdast-util-to-markdown-0.6.5.tgz#b33f67ca820d69e6cc527a93d4039249b504bebe"
   integrity sha1-sz9nyoINaebMUnqT1AOSSbUEvr4=
   dependencies:
     "@types/unist" "^2.0.0"
@@ -5588,7 +5593,7 @@ rollup-plugin-typescript-paths@^1.3.0:
 
 rollup-plugin-typescript2@^0.30.0:
   version "0.30.0"
-  resolved "https://registry.npm.taobao.org/rollup-plugin-typescript2/download/rollup-plugin-typescript2-0.30.0.tgz#1cc99ac2309bf4b9d0a3ebdbc2002aecd56083d3"
+  resolved "https://registry.nlark.com/rollup-plugin-typescript2/download/rollup-plugin-typescript2-0.30.0.tgz#1cc99ac2309bf4b9d0a3ebdbc2002aecd56083d3"
   integrity sha1-HMmawjCb9LnQo+vbwgAq7NVgg9M=
   dependencies:
     "@rollup/pluginutils" "^4.1.0"
@@ -5596,6 +5601,13 @@ rollup-plugin-typescript2@^0.30.0:
     fs-extra "8.1.0"
     resolve "1.20.0"
     tslib "2.1.0"
+
+rollup@^2.52.2:
+  version "2.52.2"
+  resolved "https://registry.nlark.com/rollup/download/rollup-2.52.2.tgz#a7e90d10ddae3e8472c2857bd9f44b09ef34a47a"
+  integrity sha1-p+kNEN2uPoRywoV72fRLCe80pHo=
+  optionalDependencies:
+    fsevents "~2.3.2"
 
 run-parallel@^1.1.9:
   version "1.2.0"
@@ -6506,9 +6518,9 @@ typedarray@^0.0.6:
   resolved "https://registry.nlark.com/typedarray/download/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^4.2.4:
+typescript@^4.2.4, typescript@^4.3.4:
   version "4.3.4"
-  resolved "https://registry.nlark.com/typescript/download/typescript-4.3.4.tgz?cache=0&sync_timestamp=1624346276376&other_urls=https%3A%2F%2Fregistry.nlark.com%2Ftypescript%2Fdownload%2Ftypescript-4.3.4.tgz#3f85b986945bcf31071decdd96cf8bfa65f9dcbc"
+  resolved "https://registry.nlark.com/typescript/download/typescript-4.3.4.tgz#3f85b986945bcf31071decdd96cf8bfa65f9dcbc"
   integrity sha1-P4W5hpRbzzEHHezdls+L+mX53Lw=
 
 uglify-js@^3.1.4:

@@ -5,7 +5,7 @@ module.exports = {
     'no-restricted-syntax': 0,
     '@typescript-eslint/method-signature-style': 0,
     '@typescript-eslint/ban-types': 0,
-
+    'no-void': 0,
     'no-param-reassign': 0,
   },
 };
