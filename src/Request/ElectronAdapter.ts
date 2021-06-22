@@ -1,5 +1,4 @@
 import type { EventEmitter } from 'events';
-import type { Stream } from 'stream';
 import type { IncomingMessage } from 'http';
 import type { Session } from '../typings.d';
 
@@ -12,6 +11,12 @@ interface AuthInfo {
 }
 
 export interface ElectronClientRequest extends EventEmitter {
+  writable: boolean;
+  write(buffer: Uint8Array | string, cb?: (err?: Error | null) => void): boolean;
+  write(str: string, encoding?: BufferEncoding, cb?: (err?: Error | null) => void): boolean;
+  end(cb?: () => void): void;
+  end(data: string | Uint8Array, cb?: () => void): void;
+  end(str: string, encoding?: BufferEncoding, cb?: () => void): void;
   /**
    * `callback` is essentially a dummy function introduced in the purpose of keeping
    * similarity with the Node.js API. It is called asynchronously in the next tick
@@ -23,7 +28,7 @@ export interface ElectronClientRequest extends EventEmitter {
    * the request headers to be issued on the wire. After the first write operation,
    * it is not allowed to add or remove a custom header.
    */
-  write(chunk: string | Buffer | Stream, encoding?: string, callback?: () => void): void;
+  write(chunk: string | Buffer, encoding?: string, callback?: () => void): void;
   /**
    * Sends the last chunk of the request data. Subsequent write or end operations
    * will not be allowed. The `finish` event is emitted just after the end operation.

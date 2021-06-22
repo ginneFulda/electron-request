@@ -1,22 +1,27 @@
+import Stream, { PassThrough } from 'stream';
 import ElectronAdapter from './ElectronAdapter';
 import RequestClient from './RequestClient';
-import type { PromiseReject } from './RequestClient';
+import { inElectron } from '../utils';
 import type { ElectronClientRequest } from './ElectronAdapter';
 import type { RequestOptions } from '../typings.d';
 
+const electronAdapter = inElectron ? new ElectronAdapter() : null;
+
 class ElectronRequestClient extends RequestClient {
-  private readonly electronAdapter = new ElectronAdapter();
-  public clientRequest: ElectronClientRequest | null = null;
-  public options: RequestOptions;
-  public requiredDecode: boolean = false;
+  private readonly decodeRequired: boolean = false;
+  private clientRequest!: ElectronClientRequest;
+  options: RequestOptions;
 
   constructor(options: RequestOptions) {
     super();
     this.options = options;
   }
 
-  public createClientRequest = async () => {
-    await this.electronAdapter.whenReady();
+  createRequest = async () => {
+    if (electronAdapter === null) {
+      throw new Error('Error in environmental judgment');
+    }
+    await electronAdapter.whenReady();
     const {
       requestURL,
       parsedURL: { protocol, host, hostname, port, pathname, origin, search },
@@ -26,10 +31,10 @@ class ElectronRequestClient extends RequestClient {
       headers,
     } = this.options;
 
-    const clientRequest = this.electronAdapter.request({
+    const options = {
       method,
       url: requestURL,
-      session: session || this.electronAdapter.getDefaultSession(),
+      session: session || electronAdapter.getDefaultSession(),
       useSessionCookies,
       protocol,
       host,
@@ -37,7 +42,9 @@ class ElectronRequestClient extends RequestClient {
       origin,
       port: Number(port),
       path: `${pathname}${search || ''}`,
-    });
+    };
+    // console.log('options: ', options);
+    const clientRequest = electronAdapter.request(options);
 
     for (const [key, headerValues] of Object.entries(headers.raw())) {
       for (const headerValue of headerValues) {
@@ -48,23 +55,44 @@ class ElectronRequestClient extends RequestClient {
     this.clientRequest = clientRequest;
   };
 
-  public cancelClientRequest = () => {
-    if (!this.clientRequest) return;
+  cancelRequest = () => {
     // In electron, `request.destroy()` does not send abort to server
     this.clientRequest.abort();
   };
 
-  public bindPrivateEvent = (reject: PromiseReject) => {
-    if (!this.clientRequest) return;
+  bindRequestEvent = () => {
     const { username, password } = this.options;
+
+    this.clientRequest.on('error', this.handleRequestError);
+    this.clientRequest.on('abort', this.handleRequestAbort);
+    this.clientRequest.on(
+      'response',
+      this.createHandleResponse({
+        decodeRequired: this.decodeRequired,
+      }),
+    );
     this.clientRequest.on('login', (authInfo, callback) => {
       if (username && password) {
         callback(username, password);
       } else {
-        this.cancelClientRequest();
-        reject(new Error(`login event received from ${authInfo.host} but no credentials provided`));
+        this.cancelRequest();
+        this.reject(
+          new Error(`Login event received from ${authInfo.host} but no credentials provided`),
+        );
       }
     });
+  };
+
+  writeToRequest = () => {
+    const { body: requestBody } = this.options;
+    if (requestBody === null) {
+      this.clientRequest.end();
+    } else if (requestBody instanceof Stream) {
+      requestBody.pipe(new PassThrough()).pipe(this.clientRequest);
+    } else {
+      this.clientRequest.write(requestBody);
+      this.clientRequest.end();
+    }
   };
 }
 

@@ -1,4 +1,5 @@
 import type { DefaultOptions } from './typings.d';
+import { COMPRESSION_TYPE } from './enum';
 
 export const DEFAULT_OPTIONS: DefaultOptions = {
   method: 'GET',
@@ -7,8 +8,13 @@ export const DEFAULT_OPTIONS: DefaultOptions = {
   maxRedirectCount: 20,
   timeout: 0,
   size: 0,
+  useSessionCookies: true,
   // redirect count
   redirectCount: 0,
 };
 
-export const SUPPORTED_COMPRESSIONS = ['gzip', 'deflate'];
+export const SUPPORTED_COMPRESSIONS = [
+  COMPRESSION_TYPE.GZIP,
+  COMPRESSION_TYPE.DEFLATE,
+  COMPRESSION_TYPE.BR,
+];

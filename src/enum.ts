@@ -8,6 +8,12 @@ export const enum HEADER_MAP {
   CONTENT_ENCODING = 'Content-Encoding',
 }
 
+export const enum COMPRESSION_TYPE {
+  GZIP = 'gzip',
+  DEFLATE = 'deflate',
+  BR = 'br',
+}
+
 export const enum METHOD_MAP {
   GET = 'GET',
   POST = 'POST',

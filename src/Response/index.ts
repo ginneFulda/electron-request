@@ -1,10 +1,10 @@
 import Stream from 'stream';
+import { WriteStream } from 'fs';
 import Blob from './Blob';
 import ProgressCallbackTransform from './ProgressCallbackTransform';
 import { HEADER_MAP } from '../enum';
 import type Headers from '../Headers';
 import type { Writable } from 'stream';
-import type { WriteStream } from 'fs';
 import type { Response, ProgressCallback } from '../typings.d';
 
 interface ResponseOptions {
@@ -103,7 +103,7 @@ export default class implements Response {
 
         if (this.size && accumBytes + chunk.length > this.size) {
           abort = true;
-          reject(new Error(`content size at ${this.requestURL} over limit: ${this.size}`));
+          reject(new Error(`Content size at ${this.requestURL} over limit: ${this.size}`));
           this.body.emit('cancel-request');
           return;
         }
@@ -135,7 +135,7 @@ export default class implements Response {
    * @param {WriteStream} dest  Download write stream
    * @param {ProgressCallback=} onProgress Download progress callback
    */
-  public download = (dest: WriteStream, onProgress?: ProgressCallback): Promise<void> => {
+  public download = (dest: Writable, onProgress?: ProgressCallback): Promise<void> => {
     return new Promise((resolve, reject) => {
       const feedStreams: Writable[] = [dest];
       if (typeof onProgress === 'function') {
@@ -144,7 +144,9 @@ export default class implements Response {
         feedStreams.unshift(progressStream);
       }
       dest.once('finish', () => {
-        dest.close();
+        if (dest instanceof WriteStream && typeof dest.close === 'function') {
+          dest.close();
+        }
         resolve();
       });
       dest.on('error', (error) => {

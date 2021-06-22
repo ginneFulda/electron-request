@@ -1,6 +1,4 @@
-import type { ElectronClientRequest } from './Request/ElectronAdapter';
-import type { Stream } from 'stream';
-import type { WriteStream } from 'fs';
+import type { Stream, Writable } from 'stream';
 import type { URL } from 'url';
 import type Headers from './Headers';
 
@@ -27,7 +25,7 @@ export interface Options {
   /**
    * Request headers
    */
-  headers?: Record<string, string>;
+  headers?: Record<string, string | string[]>;
   /**
    * Request query
    */
@@ -65,6 +63,7 @@ export interface Options {
   password?: string;
   /**
    * Only in Electron. Whether to send cookies with this request from the provided session
+   * @default true
    */
   useSessionCookies?: boolean;
   /**
@@ -81,10 +80,10 @@ export interface Response {
   stream: Stream;
   /**
    * Download file to destination
-   * @param {WriteStream} dest  Download write stream
+   * @param {Writable} dest  Writable stream
    * @param {ProgressCallback=} onProgress Download progress callback
    */
-  download: (dest: WriteStream, onProgress?: ProgressCallback) => Promise<void>;
+  download: (dest: Writable, onProgress?: ProgressCallback) => Promise<void>;
   /** Decode response as ArrayBuffer */
   arrayBuffer(): Promise<ArrayBuffer>;
   /** Decode response as Blob */
@@ -105,6 +104,7 @@ export interface DefaultOptions {
   timeout: number;
   size: number;
   redirectCount: number;
+  useSessionCookies: boolean;
 }
 
 export interface RequestConstructorOptions extends Options {
