@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/islizeqiang/electron-request/compare/v1.2.0...v1.3.0) (2021-06-22)
+
+### Features
+
+- improve maintainability ([6630cea](https://github.com/islizeqiang/electron-request/commit/6630cea60a2d3fb721bfd797005b7f5e13c9f620))
+- replace src reference path to @/ ([f08f349](https://github.com/islizeqiang/electron-request/commit/f08f34952ab2fc5b29541419eac502c79a13e03f))
+- replace string to enum ([e8f701d](https://github.com/islizeqiang/electron-request/commit/e8f701d0d05587aba17f5155f883e5b9f2fe1846))
+
+### Bug Fixes
+
+- request method uppercase issue ([4794ddb](https://github.com/islizeqiang/electron-request/commit/4794ddb64b08169e57b3204e666988bb0ca77e49))
+
 ## [1.2.0](https://github.com/islizeqiang/electron-request/compare/v1.1.0...v1.2.0) (2021-06-20)
 
 ### Features
