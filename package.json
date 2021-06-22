@@ -35,6 +35,9 @@
     "build": "rollup -c",
     "release": "npm run build && standard-version"
   },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
   "lint-staged": {
     "**/*.{js,ts,vue}": "eslint --ext .js,.ts",
     "**/*.{js,ts,md,json}": [
