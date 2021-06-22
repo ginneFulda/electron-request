@@ -1,10 +1,10 @@
 import Stream, { PassThrough } from 'stream';
 import ElectronAdapter from './ElectronAdapter';
 import RequestClient from './RequestClient';
-import { inElectron } from '../utils';
-import { REQUEST_EVENT } from '../enum';
+import { inElectron } from '@/utils';
+import { REQUEST_EVENT } from '@/enum';
 import type { ElectronClientRequest } from './ElectronAdapter';
-import type { RequestOptions } from '../typings.d';
+import type { RequestOptions } from '@/typings.d';
 
 const electronAdapter = inElectron ? new ElectronAdapter() : null;
 

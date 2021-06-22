@@ -16,7 +16,10 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "removeComments": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["scripts", "dist"]

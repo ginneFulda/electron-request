@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { Transform } from 'stream';
 import type { TransformCallback } from 'stream';
-import type { ProgressCallback } from '../typings.d';
+import type { ProgressCallback } from '@/typings.d';
 
 export default class ProgressCallbackTransform extends Transform {
   private start = Date.now();

@@ -2,8 +2,8 @@ import http from 'http';
 import https from 'https';
 import Stream from 'stream';
 import RequestClient from './RequestClient';
-import { REQUEST_EVENT } from '../enum';
-import type { RequestOptions } from '../typings.d';
+import { REQUEST_EVENT } from '@/enum';
+import type { RequestOptions } from '@/typings.d';
 
 const adapterForHttp = (protocol: string) => {
   if (protocol === 'http:') {

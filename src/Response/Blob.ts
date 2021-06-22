@@ -1,6 +1,6 @@
 // Inspired by https://github.com/tmpvar/jsdom/blob/aa85b2abf07766ff7bf5c1f6daafb3726f2f2db5/lib/jsdom/living/blob.js
 
-import type { Blob } from '../typings.d';
+import type { Blob } from '@/typings.d';
 
 class BlobImpl implements Blob {
   private buffer: Buffer;

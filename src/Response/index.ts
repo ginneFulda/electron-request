@@ -2,10 +2,10 @@ import Stream from 'stream';
 import { WriteStream } from 'fs';
 import Blob from './Blob';
 import ProgressCallbackTransform from './ProgressCallbackTransform';
-import { HEADER_MAP, RESPONSE_EVENT } from '../enum';
-import type Headers from '../Headers';
+import { HEADER_MAP, RESPONSE_EVENT } from '@/enum';
+import type Headers from '@/Headers';
 import type { Writable } from 'stream';
-import type { Response, ProgressCallback } from '../typings.d';
+import type { Response, ProgressCallback } from '@/typings.d';
 
 interface ResponseOptions {
   requestURL: string;

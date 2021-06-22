@@ -1,6 +1,6 @@
 import type { EventEmitter } from 'events';
 import type { IncomingMessage } from 'http';
-import type { Session } from '../typings.d';
+import type { Session } from '@/typings.d';
 
 interface AuthInfo {
   isProxy: boolean;

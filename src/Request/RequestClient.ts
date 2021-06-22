@@ -1,12 +1,12 @@
 import zlib from 'zlib';
 import { URL } from 'url';
 import { PassThrough } from 'stream';
-import { isRedirect } from '../utils';
-import ResponseImpl from '../Response';
-import Headers from '../Headers';
-import { HEADER_MAP, METHOD_MAP, COMPRESSION_TYPE, RESPONSE_EVENT } from '../enum';
+import { isRedirect } from '@/utils';
+import ResponseImpl from '@/Response';
+import Headers from '@/Headers';
+import { HEADER_MAP, METHOD_MAP, COMPRESSION_TYPE, RESPONSE_EVENT } from '@/enum';
 import type { IncomingMessage } from 'http';
-import type { RequestOptions, Response } from '../typings.d';
+import type { RequestOptions, Response } from '@/typings.d';
 
 interface CreateHandleResponseOptions {
   decodeRequired: boolean;
