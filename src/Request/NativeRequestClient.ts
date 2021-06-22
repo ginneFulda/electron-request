@@ -2,6 +2,7 @@ import http from 'http';
 import https from 'https';
 import Stream from 'stream';
 import RequestClient from './RequestClient';
+import { REQUEST_EVENT } from '../enum';
 import type { RequestOptions } from '../typings.d';
 
 const adapterForHttp = (protocol: string) => {
@@ -51,10 +52,10 @@ class NativeRequestClient extends RequestClient {
   };
 
   bindRequestEvent = () => {
-    this.clientRequest.on('error', this.handleRequestError);
-    this.clientRequest.on('abort', this.handleRequestAbort);
+    this.clientRequest.on(REQUEST_EVENT.ERROR, this.handleRequestError);
+    this.clientRequest.on(REQUEST_EVENT.ABORT, this.handleRequestAbort);
     this.clientRequest.on(
-      'response',
+      REQUEST_EVENT.RESPONSE,
       this.createHandleResponse({
         decodeRequired: this.decodeRequired,
       }),

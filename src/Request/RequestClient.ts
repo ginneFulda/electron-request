@@ -4,7 +4,7 @@ import { PassThrough } from 'stream';
 import { isRedirect } from '../utils';
 import ResponseImpl from '../Response';
 import Headers from '../Headers';
-import { HEADER_MAP, METHOD_MAP, COMPRESSION_TYPE } from '../enum';
+import { HEADER_MAP, METHOD_MAP, COMPRESSION_TYPE, RESPONSE_EVENT } from '../enum';
 import type { IncomingMessage } from 'http';
 import type { RequestOptions, Response } from '../typings.d';
 
@@ -87,9 +87,9 @@ abstract class RequestClient {
       }
 
       let responseBody = new PassThrough();
-      res.on('error', (error) => responseBody.emit('error', error));
-      responseBody.on('error', this.cancelRequest);
-      responseBody.on('cancel-request', this.cancelRequest);
+      res.on(RESPONSE_EVENT.ERROR, (error) => responseBody.emit(RESPONSE_EVENT.ERROR, error));
+      responseBody.on(RESPONSE_EVENT.ERROR, this.cancelRequest);
+      responseBody.on(RESPONSE_EVENT.CANCEL_REQUEST, this.cancelRequest);
       res.pipe(responseBody);
 
       const responseOptions = {

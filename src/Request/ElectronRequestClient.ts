@@ -2,6 +2,7 @@ import Stream, { PassThrough } from 'stream';
 import ElectronAdapter from './ElectronAdapter';
 import RequestClient from './RequestClient';
 import { inElectron } from '../utils';
+import { REQUEST_EVENT } from '../enum';
 import type { ElectronClientRequest } from './ElectronAdapter';
 import type { RequestOptions } from '../typings.d';
 
@@ -63,15 +64,15 @@ class ElectronRequestClient extends RequestClient {
   bindRequestEvent = () => {
     const { username, password } = this.options;
 
-    this.clientRequest.on('error', this.handleRequestError);
-    this.clientRequest.on('abort', this.handleRequestAbort);
+    this.clientRequest.on(REQUEST_EVENT.ERROR, this.handleRequestError);
+    this.clientRequest.on(REQUEST_EVENT.ABORT, this.handleRequestAbort);
     this.clientRequest.on(
-      'response',
+      REQUEST_EVENT.RESPONSE,
       this.createHandleResponse({
         decodeRequired: this.decodeRequired,
       }),
     );
-    this.clientRequest.on('login', (authInfo, callback) => {
+    this.clientRequest.on(REQUEST_EVENT.LOGIN, (authInfo, callback) => {
       if (username && password) {
         callback(username, password);
       } else {

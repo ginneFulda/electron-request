@@ -8,6 +8,20 @@ export const enum HEADER_MAP {
   CONTENT_ENCODING = 'Content-Encoding',
 }
 
+export const enum REQUEST_EVENT {
+  ERROR = 'error',
+  ABORT = 'abort',
+  RESPONSE = 'response',
+  LOGIN = 'login',
+}
+
+export const enum RESPONSE_EVENT {
+  ERROR = 'error',
+  CANCEL_REQUEST = 'cancel-request',
+  DATA = 'data',
+  END = 'end',
+}
+
 export const enum COMPRESSION_TYPE {
   GZIP = 'gzip',
   DEFLATE = 'deflate',

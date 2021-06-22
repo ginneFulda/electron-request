@@ -2,7 +2,7 @@ import Stream from 'stream';
 import { WriteStream } from 'fs';
 import Blob from './Blob';
 import ProgressCallbackTransform from './ProgressCallbackTransform';
-import { HEADER_MAP } from '../enum';
+import { HEADER_MAP, RESPONSE_EVENT } from '../enum';
 import type Headers from '../Headers';
 import type { Writable } from 'stream';
 import type { Response, ProgressCallback } from '../typings.d';
@@ -88,7 +88,7 @@ export default class implements Response {
       }
 
       // handle stream error, such as incorrect content-encoding
-      this.body.on('error', (err) => {
+      this.body.on(RESPONSE_EVENT.ERROR, (err) => {
         reject(
           new Error(
             `Invalid response body while trying to fetch ${this.requestURL}: ${err.message}`,
@@ -96,7 +96,7 @@ export default class implements Response {
         );
       });
 
-      this.body.on('data', (chunk: Buffer) => {
+      this.body.on(RESPONSE_EVENT.DATA, (chunk: Buffer) => {
         if (abort || chunk === null) {
           return;
         }
@@ -112,7 +112,7 @@ export default class implements Response {
         accum.push(chunk);
       });
 
-      this.body.on('end', () => {
+      this.body.on(RESPONSE_EVENT.END, () => {
         if (abort) {
           return;
         }
@@ -207,7 +207,7 @@ export default class implements Response {
     try {
       result = JSON.parse(buffer.toString());
     } catch {
-      result = buffer.toString() as unknown as T;
+      throw new Error(buffer.toString());
     }
     return result;
   };
