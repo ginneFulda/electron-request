@@ -11,7 +11,8 @@ import type { RequestConstructorOptions, RequestOptions } from '@/typings.d';
 const getRequestOptions = (constructorOptions: RequestConstructorOptions): RequestOptions => {
   const options = { ...DEFAULT_OPTIONS, ...constructorOptions };
 
-  const { method, body, requestURL, query, headers: headerOptions } = options;
+  const method = options.method.toUpperCase();
+  const { body, requestURL, query, headers: headerOptions } = options;
 
   if (body !== null && (method === METHOD_MAP.GET || method === METHOD_MAP.HEAD)) {
     throw new TypeError('Request with GET/HEAD method cannot have body');
@@ -53,7 +54,7 @@ const getRequestOptions = (constructorOptions: RequestConstructorOptions): Reque
 
   return {
     ...options,
-    method: method.toUpperCase(),
+    method,
     parsedURL,
     headers,
   };
