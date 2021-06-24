@@ -14,11 +14,12 @@ const sanitizeValue = (value: string) => {
   return value;
 };
 
-class Headers {
-  private map: Map<string, string[]>;
+type HeaderValue = string | string[];
 
-  constructor(init: Record<string, string | string[] | undefined> = {}) {
-    this.map = new Map();
+class Headers {
+  private map: Map<string, string | string[]> = new Map();
+
+  constructor(init: Record<string, HeaderValue | undefined> = {}) {
     for (const [key, value] of Object.entries(init)) {
       if (value) {
         this.set(key, value);
@@ -27,7 +28,7 @@ class Headers {
   }
 
   public raw = () => {
-    const result: Record<string, string[]> = {};
+    const result: Record<string, HeaderValue> = {};
     for (const [key, value] of this.map.entries()) {
       result[key] = value;
     }
@@ -35,26 +36,29 @@ class Headers {
   };
 
   public append = (key: string, value: string) => {
-    const prev = this.map.get(key);
+    const prev = this.get(key);
     if (!prev) {
       this.set(key, value);
     } else {
-      prev.push(sanitizeValue(value));
+      this.set(key, Array.isArray(prev) ? [...prev, value] : [prev, value]);
     }
   };
 
   public get = (key: string) => {
     const value = this.map.get(sanitizeKey(key));
-    if (value?.length === 1) {
-      return value[0];
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (Array.isArray(value)) {
+      return value.join(',');
     }
     return null;
   };
 
   public has = (key: string) => this.map.has(sanitizeKey(key));
 
-  public set = (key: string, value: string | string[]) => {
-    const data = Array.isArray(value) ? value.map(sanitizeValue) : [sanitizeValue(value)];
+  public set = (key: string, value: HeaderValue) => {
+    const data = Array.isArray(value) ? value.map(sanitizeValue) : sanitizeValue(value);
     this.map.set(sanitizeKey(key), data);
   };
 
