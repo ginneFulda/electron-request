@@ -2,10 +2,11 @@ import Stream from 'stream';
 import { WriteStream } from 'fs';
 import Blob from './Blob';
 import ProgressCallbackTransform from './ProgressCallbackTransform';
+import DigestTransform from './DigestTransform';
 import { HEADER_MAP, RESPONSE_EVENT } from '@/enum';
-import type Headers from '@/Headers';
 import type { Writable } from 'stream';
-import type { Response, ProgressCallback } from '@/typings.d';
+import type Headers from '@/Headers';
+import type { Response, ProgressCallback, ValidateOptions } from '@/typings.d';
 
 interface ResponseOptions {
   requestURL: string;
@@ -20,16 +21,16 @@ export default class implements Response {
   private statusCode: number;
   private body: Stream;
   private requestURL: string;
-  private headers: Headers;
+  private responseHeaders: Headers;
   private timeout: number;
   private size: number;
 
   constructor(body: Stream, options: ResponseOptions) {
-    const { statusCode = 200, requestURL, headers, timeout, size } = options;
+    const { statusCode, requestURL, headers, timeout, size } = options;
     this.statusCode = statusCode;
     this.body = body;
     this.requestURL = requestURL;
-    this.headers = headers;
+    this.responseHeaders = headers;
     this.timeout = timeout;
     this.size = size;
     this.consumed = false;
@@ -130,32 +131,50 @@ export default class implements Response {
     return this.statusCode >= 200 && this.statusCode < 300;
   }
 
+  get headers() {
+    return this.responseHeaders.raw();
+  }
+
   /**
    * Download file to destination
-   * @param {WriteStream} dest  Download write stream
+   * @param {WriteStream} fileOut  Download write stream
    * @param {ProgressCallback=} onProgress Download progress callback
    */
-  public download = (dest: Writable, onProgress?: ProgressCallback): Promise<void> => {
+  public download = (
+    fileOut: Writable,
+    onProgress?: ProgressCallback,
+    validateOptions?: ValidateOptions,
+  ): Promise<void> => {
     return new Promise((resolve, reject) => {
-      const feedStreams: Writable[] = [dest];
+      const feedStreams: Writable[] = [];
+
       if (typeof onProgress === 'function') {
-        const contentLength = Number(this.headers.get(HEADER_MAP.CONTENT_LENGTH));
-        const progressStream = new ProgressCallbackTransform(contentLength, onProgress);
-        feedStreams.unshift(progressStream);
+        const contentLength = Number(this.responseHeaders.get(HEADER_MAP.CONTENT_LENGTH));
+        if (contentLength) {
+          feedStreams.push(new ProgressCallbackTransform(contentLength, onProgress));
+        }
       }
-      dest.once('finish', () => {
-        if (dest instanceof WriteStream && typeof dest.close === 'function') {
-          dest.close();
+
+      if (validateOptions) {
+        feedStreams.push(new DigestTransform(validateOptions));
+      }
+
+      feedStreams.push(fileOut);
+
+      let lastStream = this.stream;
+      for (const stream of feedStreams) {
+        stream.on('error', (error: Error) => {
+          reject(error);
+        });
+        lastStream = lastStream.pipe(stream);
+      }
+
+      fileOut.once('finish', () => {
+        if (fileOut instanceof WriteStream && typeof fileOut.close === 'function') {
+          fileOut.close();
         }
         resolve();
       });
-      dest.on('error', (error) => {
-        reject(error);
-      });
-      let lastStream = this.stream;
-      for (const stream of feedStreams) {
-        lastStream = lastStream.pipe(stream);
-      }
     });
   };
 
@@ -182,7 +201,7 @@ export default class implements Response {
    * Decode response as Blob
    */
   blob = async (): Promise<Blob> => {
-    const contentType = (this.headers && this.headers.get(HEADER_MAP.CONTENT_TYPE)) || '';
+    const contentType = this.responseHeaders.get(HEADER_MAP.CONTENT_TYPE) || '';
     const buffer = await this.consumeResponse();
     const blob = new Blob([buffer], {
       type: contentType.toLowerCase(),

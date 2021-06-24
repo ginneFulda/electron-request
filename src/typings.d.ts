@@ -1,3 +1,4 @@
+import type { BinaryToTextEncoding } from 'crypto';
 import type { Stream, Writable } from 'stream';
 import type { URL } from 'url';
 import type Headers from './Headers';
@@ -73,17 +74,54 @@ export interface Options {
   session?: Session;
 }
 
+export interface ProgressInfo {
+  /** Total file bytes */
+  total: number;
+  /** Delta file bytes */
+  delta: number;
+  /** Transferred file bytes */
+  transferred: number;
+  /** Transferred percentage */
+  percent: number;
+  /** Bytes transferred per second */
+  bytesPerSecond: number;
+}
+
+export type ProgressCallback = (progressInfo: ProgressInfo) => void;
+
+export interface ValidateOptions {
+  /** Expected hash */
+  expected: string;
+  /**
+   * Algorithm: first parameter of crypto.createHash
+   * @default 'md5'
+   */
+  algorithm?: string;
+  /**
+   * Encoding: first parameter of Hash.digest
+   * @default 'base64'
+   */
+  encoding?: BinaryToTextEncoding;
+}
+
 export interface Response {
   /** Convenience property representing if the request ended normally */
   ok: boolean;
+  /** Response headers */
+  headers: Record<string, string | string[]>;
   /** Return origin stream */
   stream: Stream;
   /**
    * Download file to destination
-   * @param {Writable} dest  Writable stream
+   * @param {Writable} destination Writable destination stream
    * @param {ProgressCallback=} onProgress Download progress callback
+   * @param {ValidateOptions=} validateOptions Validate options
    */
-  download: (dest: Writable, onProgress?: ProgressCallback) => Promise<void>;
+  download: (
+    destination: Writable,
+    onProgress?: ProgressCallback,
+    validateOptions?: ValidateOptions,
+  ) => Promise<void>;
   /** Decode response as ArrayBuffer */
   arrayBuffer(): Promise<ArrayBuffer>;
   /** Decode response as Blob */
@@ -117,21 +155,6 @@ export interface RequestOptions
   parsedURL: URL;
   headers: Headers;
 }
-
-export interface ProgressInfo {
-  /** Total file bytes */
-  total: number;
-  /** Delta file bytes */
-  delta: number;
-  /** Transferred file bytes */
-  transferred: number;
-  /** Transferred percentage */
-  percent: number;
-  /** Bytes transferred per second */
-  bytesPerSecond: number;
-}
-
-export type ProgressCallback = (progressInfo: ProgressInfo) => void;
 
 export interface Blob {
   size: number;

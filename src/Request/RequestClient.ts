@@ -86,6 +86,10 @@ abstract class RequestClient {
         this.resolve(this.send());
       }
 
+      if (statusCode === 200 && headers.get(HEADER_MAP.CONTENT_LENGTH) === null) {
+        this.resolve(this.send());
+      }
+
       let responseBody = new PassThrough();
       res.on(RESPONSE_EVENT.ERROR, (error) => responseBody.emit(RESPONSE_EVENT.ERROR, error));
       responseBody.on(RESPONSE_EVENT.ERROR, this.cancelRequest);
