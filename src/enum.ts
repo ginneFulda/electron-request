@@ -1,11 +1,11 @@
 export const enum HEADER_MAP {
-  CONTENT_LENGTH = 'Content-Length',
-  ACCEPT_ENCODING = 'Accept-Encoding',
-  ACCEPT = 'Accept',
-  CONNECTION = 'Connection',
-  CONTENT_TYPE = 'Content-Type',
-  LOCATION = 'Location',
-  CONTENT_ENCODING = 'Content-Encoding',
+  CONTENT_LENGTH = 'content-length',
+  ACCEPT_ENCODING = 'accept-encoding',
+  ACCEPT = 'accept',
+  CONNECTION = 'connection',
+  CONTENT_TYPE = 'content-Type',
+  LOCATION = 'location',
+  CONTENT_ENCODING = 'content-encoding',
 }
 
 export const enum REQUEST_EVENT {

@@ -35,7 +35,7 @@ const getRequestOptions = (constructorOptions: RequestConstructorOptions): Reque
   // User cannot set content-length themself as per fetch spec
   headers.delete(HEADER_MAP.CONTENT_LENGTH);
   // Add compression header
-  headers.set(HEADER_MAP.ACCEPT_ENCODING, SUPPORTED_COMPRESSIONS.join(', '));
+  headers.set(HEADER_MAP.ACCEPT_ENCODING, SUPPORTED_COMPRESSIONS.join(','));
   // Add accept header
   if (!headers.has(HEADER_MAP.ACCEPT)) {
     headers.set(HEADER_MAP.ACCEPT, '*/*');
