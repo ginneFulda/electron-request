@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/islizeqiang/electron-request/compare/v1.3.0...v1.4.0) (2021-06-27)
+
+### Features
+
+- add useNative options ([760b882](https://github.com/islizeqiang/electron-request/commit/760b8828758a03924db6de3994ceca56943a9aaa))
+- remove response timeout ([4b77919](https://github.com/islizeqiang/electron-request/commit/4b77919ce4cee5d6ed2e514bc07b77147e991a0f))
+- response download support validate ([774c134](https://github.com/islizeqiang/electron-request/commit/774c134b737e8ac248322d5988e3d3d9a63c887b))
+- when ContenLength is invalid, the progress callback more intuitive ([326d082](https://github.com/islizeqiang/electron-request/commit/326d082f21497ec844332152af1dca5b9b85ea32))
+
+### Bug Fixes
+
+- header instance return value ([a9b6f3f](https://github.com/islizeqiang/electron-request/commit/a9b6f3fc46e5a21a7c5d28da721ce7561def9605))
+
 ## [1.3.0](https://github.com/islizeqiang/electron-request/compare/v1.2.0...v1.3.0) (2021-06-22)
 
 ### Features
