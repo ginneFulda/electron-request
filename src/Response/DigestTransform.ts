@@ -1,7 +1,7 @@
-/* eslint-disable no-underscore-dangle */
 import { Transform } from 'stream';
 import { createHash } from 'crypto';
 import type { BinaryToTextEncoding, Hash } from 'crypto';
+import type { TransformCallback } from 'stream';
 import type { ValidateOptions } from '@/typings.d';
 
 const newError = (message: string, code: string) => {
@@ -16,13 +16,12 @@ class DigestTransform extends Transform {
   readonly expected: string;
   private readonly algorithm: string;
   private readonly encoding: BinaryToTextEncoding;
+  isValidateOnEnd = true;
 
   // noinspection JSUnusedGlobalSymbols
   get actual() {
     return this._actual;
   }
-
-  isValidateOnEnd = true;
 
   constructor(options: ValidateOptions) {
     super();
@@ -34,13 +33,13 @@ class DigestTransform extends Transform {
   }
 
   // noinspection JSUnusedGlobalSymbols
-  _transform(chunk: Buffer, encoding: string, callback: any) {
+  _transform(chunk: Buffer, encoding: BufferEncoding, callback: TransformCallback) {
     this.digester.update(chunk);
     callback(null, chunk);
   }
 
   // noinspection JSUnusedGlobalSymbols
-  _flush(callback: any): void {
+  _flush(callback: TransformCallback): void {
     this._actual = this.digester.digest(this.encoding);
 
     if (this.isValidateOnEnd) {
