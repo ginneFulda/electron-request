@@ -9,6 +9,7 @@ export const DEFAULT_OPTIONS: DefaultOptions = {
   timeout: 0,
   size: 0,
   useSessionCookies: true,
+  useNative: false,
   // redirect count
   redirectCount: 0,
 };

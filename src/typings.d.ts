@@ -51,6 +51,11 @@ export interface Options {
    * @default 0
    */
   size?: number;
+  /**
+   * Whether to use nodejs native request
+   * @default false
+   */
+  useNative?: boolean;
 
   // Docs: https://www.electronjs.org/docs/api/client-request#new-clientrequestoptions
 
@@ -111,6 +116,16 @@ export interface Response {
   headers: Record<string, string | string[]>;
   /** Return origin stream */
   stream: Stream;
+  /** Decode response as ArrayBuffer */
+  arrayBuffer(): Promise<ArrayBuffer>;
+  /** Decode response as Blob */
+  blob(): Promise<Blob>;
+  /** Decode response as text */
+  text(): Promise<string>;
+  /** Decode response as json */
+  json<T>(): Promise<T>;
+  /** Decode response as buffer */
+  buffer(): Promise<Buffer>;
   /**
    * Download file to destination
    * @param {Writable} destination Writable destination stream
@@ -122,16 +137,6 @@ export interface Response {
     onProgress?: ProgressCallback,
     validateOptions?: ValidateOptions,
   ) => Promise<void>;
-  /** Decode response as ArrayBuffer */
-  arrayBuffer(): Promise<ArrayBuffer>;
-  /** Decode response as Blob */
-  blob(): Promise<Blob>;
-  /** Decode response as text */
-  text(): Promise<string>;
-  /** Decode response as json */
-  json<T>(): Promise<T>;
-  /** Decode response as buffer */
-  buffer(): Promise<Buffer>;
 }
 
 export interface DefaultOptions {
@@ -142,6 +147,7 @@ export interface DefaultOptions {
   timeout: number;
   size: number;
   redirectCount: number;
+  useNative: boolean;
   useSessionCookies: boolean;
 }
 

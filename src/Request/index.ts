@@ -65,7 +65,8 @@ class Request {
 
   constructor(constructorOptions: RequestConstructorOptions) {
     const options = getRequestOptions(constructorOptions);
-    this.client = inElectron ? new ElectronRequest(options) : new NativeRequest(options);
+    this.client =
+      !options.useNative && inElectron ? new ElectronRequest(options) : new NativeRequest(options);
   }
 
   public send = () => {
