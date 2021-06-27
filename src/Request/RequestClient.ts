@@ -8,12 +8,9 @@ import { HEADER_MAP, METHOD_MAP, COMPRESSION_TYPE, RESPONSE_EVENT } from '@/enum
 import type { IncomingMessage } from 'http';
 import type { RequestOptions, Response } from '@/typings.d';
 
-interface CreateHandleResponseOptions {
+type CreateHandleResponse = (options: {
   decodeRequired: boolean;
-}
-type CreateHandleResponse = (
-  options: CreateHandleResponseOptions,
-) => (response: IncomingMessage) => void;
+}) => (response: IncomingMessage) => void;
 
 abstract class RequestClient {
   protected abstract createRequest(): Promise<void>;
@@ -53,7 +50,6 @@ abstract class RequestClient {
         requestURL,
         parsedURL,
         size,
-        timeout,
       } = this.options;
 
       this.clearRequestTimeout();
@@ -86,26 +82,21 @@ abstract class RequestClient {
         this.resolve(this.send());
       }
 
-      if (statusCode === 200 && headers.get(HEADER_MAP.CONTENT_LENGTH) === null) {
-        this.resolve(this.send());
-      }
-
       let responseBody = new PassThrough();
       res.on(RESPONSE_EVENT.ERROR, (error) => responseBody.emit(RESPONSE_EVENT.ERROR, error));
       responseBody.on(RESPONSE_EVENT.ERROR, this.cancelRequest);
       responseBody.on(RESPONSE_EVENT.CANCEL_REQUEST, this.cancelRequest);
       res.pipe(responseBody);
 
-      const responseOptions = {
-        requestURL,
-        statusCode,
-        headers,
-        size,
-        timeout,
-      };
-
       const resolveResponse = () => {
-        this.resolve(new ResponseImpl(responseBody, responseOptions));
+        this.resolve(
+          new ResponseImpl(responseBody, {
+            requestURL,
+            statusCode,
+            headers,
+            size,
+          }),
+        );
       };
 
       if (decodeRequired) {

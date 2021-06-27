@@ -1,8 +1,8 @@
-import Stream from 'stream';
+import { Stream } from 'stream';
 import { WriteStream } from 'fs';
 import Blob from './Blob';
-import ProgressCallbackTransform from './ProgressCallbackTransform';
 import DigestTransform from './DigestTransform';
+import ProgressCallbackTransform from './ProgressCallbackTransform';
 import { HEADER_MAP, RESPONSE_EVENT } from '@/enum';
 import type { Writable } from 'stream';
 import type Headers from '@/Headers';
@@ -13,35 +13,27 @@ interface ResponseOptions {
   statusCode: number;
   headers: Headers;
   size: number;
-  timeout: number;
 }
 
 export default class implements Response {
-  private consumed: boolean;
-  private statusCode: number;
+  private disturbed: boolean;
   private body: Stream;
-  private requestURL: string;
-  private responseHeaders: Headers;
-  private timeout: number;
-  private size: number;
+  private config: ResponseOptions;
 
   constructor(body: Stream, options: ResponseOptions) {
-    const { statusCode, requestURL, headers, timeout, size } = options;
-    this.statusCode = statusCode;
     this.body = body;
-    this.requestURL = requestURL;
-    this.responseHeaders = headers;
-    this.timeout = timeout;
-    this.size = size;
-    this.consumed = false;
+    this.config = options;
+    this.disturbed = false;
   }
 
   private consumeResponse = (): Promise<Buffer> => {
-    if (this.consumed) {
-      return Promise.reject(new Error(`Response used already for: ${this.requestURL}`));
+    const { requestURL, size } = this.config;
+
+    if (this.disturbed) {
+      return Promise.reject(new Error(`Response used already for: ${requestURL}`));
     }
 
-    this.consumed = true;
+    this.disturbed = true;
 
     // body is null
     if (this.body === null) {
@@ -74,26 +66,10 @@ export default class implements Response {
     let abort = false;
 
     return new Promise((resolve, reject) => {
-      let resTimeout: NodeJS.Timeout;
-      // allow timeout on slow response body
-      if (this.timeout) {
-        resTimeout = setTimeout(() => {
-          abort = true;
-          reject(
-            new Error(
-              `Response timeout while trying to fetch ${this.requestURL} (over ${this.timeout}ms)`,
-            ),
-          );
-          this.body.emit('cancel-request');
-        }, this.timeout);
-      }
-
       // handle stream error, such as incorrect content-encoding
       this.body.on(RESPONSE_EVENT.ERROR, (err) => {
         reject(
-          new Error(
-            `Invalid response body while trying to fetch ${this.requestURL}: ${err.message}`,
-          ),
+          new Error(`Invalid response body while trying to fetch ${requestURL}: ${err.message}`),
         );
       });
 
@@ -102,9 +78,9 @@ export default class implements Response {
           return;
         }
 
-        if (this.size && accumBytes + chunk.length > this.size) {
+        if (size && accumBytes + chunk.length > size) {
           abort = true;
-          reject(new Error(`Content size at ${this.requestURL} over limit: ${this.size}`));
+          reject(new Error(`Content size at ${requestURL} over limit: ${size}`));
           this.body.emit('cancel-request');
           return;
         }
@@ -117,8 +93,6 @@ export default class implements Response {
         if (abort) {
           return;
         }
-
-        clearTimeout(resTimeout);
         resolve(Buffer.concat(accum));
       });
     });
@@ -128,11 +102,12 @@ export default class implements Response {
    * Convenience property representing if the request ended normally
    */
   get ok(): boolean {
-    return this.statusCode >= 200 && this.statusCode < 300;
+    const { statusCode } = this.config;
+    return statusCode >= 200 && statusCode < 300;
   }
 
   get headers() {
-    return this.responseHeaders.raw();
+    return this.config.headers.raw();
   }
 
   /**
@@ -140,27 +115,25 @@ export default class implements Response {
    * @param {WriteStream} fileOut  Download write stream
    * @param {ProgressCallback=} onProgress Download progress callback
    */
-  public download = (
+  public download = async (
     fileOut: Writable,
     onProgress?: ProgressCallback,
     validateOptions?: ValidateOptions,
   ): Promise<void> => {
+    const feedStreams: Writable[] = [];
+
+    if (typeof onProgress === 'function') {
+      const contentLength = Number(this.config.headers.get(HEADER_MAP.CONTENT_LENGTH));
+      feedStreams.push(new ProgressCallbackTransform(contentLength, onProgress));
+    }
+
+    if (validateOptions) {
+      feedStreams.push(new DigestTransform(validateOptions));
+    }
+
+    feedStreams.push(fileOut);
+
     return new Promise((resolve, reject) => {
-      const feedStreams: Writable[] = [];
-
-      if (typeof onProgress === 'function') {
-        const contentLength = Number(this.responseHeaders.get(HEADER_MAP.CONTENT_LENGTH));
-        if (contentLength) {
-          feedStreams.push(new ProgressCallbackTransform(contentLength, onProgress));
-        }
-      }
-
-      if (validateOptions) {
-        feedStreams.push(new DigestTransform(validateOptions));
-      }
-
-      feedStreams.push(fileOut);
-
       let lastStream = this.stream;
       for (const stream of feedStreams) {
         stream.on('error', (error: Error) => {
@@ -182,10 +155,9 @@ export default class implements Response {
    * Return origin stream
    */
   get stream(): Stream {
-    if (this.consumed) {
-      throw new Error(`Response used already for: ${this.requestURL}`);
+    if (this.disturbed) {
+      throw new Error(`Response used already for: ${this.config.requestURL}`);
     }
-    this.consumed = true;
     return this.body;
   }
 
@@ -201,7 +173,7 @@ export default class implements Response {
    * Decode response as Blob
    */
   blob = async (): Promise<Blob> => {
-    const contentType = this.responseHeaders.get(HEADER_MAP.CONTENT_TYPE) || '';
+    const contentType = this.config.headers.get(HEADER_MAP.CONTENT_TYPE) || '';
     const buffer = await this.consumeResponse();
     const blob = new Blob([buffer], {
       type: contentType.toLowerCase(),

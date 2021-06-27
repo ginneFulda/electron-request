@@ -7,5 +7,6 @@ module.exports = {
     '@typescript-eslint/ban-types': 0,
     'no-void': 0,
     'no-param-reassign': 0,
+    'no-underscore-dangle': 0,
   },
 };
