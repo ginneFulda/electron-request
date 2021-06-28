@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/islizeqiang/electron-request/compare/v1.4.0...v1.5.0) (2021-06-28)
+
+### Features
+
+- update README ([b02afa1](https://github.com/islizeqiang/electron-request/commit/b02afa18930ca8d16265ed5b16d7156d54a96d70))
+
 ## [1.4.0](https://github.com/islizeqiang/electron-request/compare/v1.3.0...v1.4.0) (2021-06-27)
 
 ### Features
