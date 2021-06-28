@@ -8,9 +8,8 @@ import Headers from '@/Headers';
 import { HEADER_MAP, METHOD_MAP, RESPONSE_EVENT } from '@/enum';
 import type { RequestOptions, RequestClient, Response } from '@/typings.d';
 
-const electronAdapter = inElectron ? new ElectronAdapter() : null;
-
 class ElectronRequestClient implements RequestClient {
+  private readonly electronAdapter = inElectron ? new ElectronAdapter() : null;
   private options: RequestOptions;
   private redirectCount: number = 0;
   private timeoutId: NodeJS.Timeout | null = null;
@@ -26,10 +25,10 @@ class ElectronRequestClient implements RequestClient {
   };
 
   private createRequest = async () => {
-    if (electronAdapter === null) {
+    if (this.electronAdapter === null) {
       throw new Error('Error in environmental judgment');
     }
-    await electronAdapter.whenReady();
+    await this.electronAdapter.whenReady();
     const {
       requestURL,
       parsedURL: { protocol, host, hostname, port, pathname, origin, search },
@@ -42,7 +41,7 @@ class ElectronRequestClient implements RequestClient {
     const options = {
       method,
       url: requestURL,
-      session: session || electronAdapter.getDefaultSession(),
+      session: session || this.electronAdapter.getDefaultSession(),
       useSessionCookies,
       protocol,
       host,
@@ -52,7 +51,7 @@ class ElectronRequestClient implements RequestClient {
       path: `${pathname}${search || ''}`,
     };
     // console.log('options: ', options);
-    const clientRequest = electronAdapter.request(options);
+    const clientRequest = this.electronAdapter.request(options);
 
     for (const [key, headerValues] of Object.entries(headers.raw())) {
       for (const headerValue of headerValues) {

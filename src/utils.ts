@@ -2,9 +2,13 @@ export const inElectron = (() => {
   if (!process.versions.electron) {
     return false;
   }
-  // eslint-disable-next-line global-require
-  const electron = require('electron');
-  return Boolean(electron && electron.app);
+  try {
+    // eslint-disable-next-line global-require
+    const electron = require('electron');
+    return Boolean(electron && electron.app);
+  } catch {
+    return false;
+  }
 })();
 
 export const extractContentType = (body: unknown): string | null => {
