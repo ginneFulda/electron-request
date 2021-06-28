@@ -2,7 +2,7 @@ import http from 'http';
 import zlib from 'zlib';
 import https from 'https';
 import { URL } from 'url';
-import { Stream, PassThrough } from 'stream';
+import { Stream, PassThrough, pipeline as pump } from 'stream';
 import ResponseImpl from '@/Response';
 import Headers from '@/Headers';
 import { REQUEST_EVENT } from '@/enum';
@@ -129,11 +129,13 @@ class NativeRequestClient {
           onFulfilled(this.send());
         }
 
-        let responseBody = new PassThrough();
-        res.on(RESPONSE_EVENT.ERROR, (error) => responseBody.emit(RESPONSE_EVENT.ERROR, error));
+        const onPumpRejected = (error: NodeJS.ErrnoException | null) => {
+          onRejected(error || new Error('Error occurred while pipe to response'));
+        };
+
+        let responseBody = pump(res, new PassThrough(), onPumpRejected);
         responseBody.on(RESPONSE_EVENT.ERROR, cancelRequest);
         responseBody.on(RESPONSE_EVENT.CANCEL_REQUEST, cancelRequest);
-        res.pipe(responseBody);
 
         const resolveResponse = () => {
           onFulfilled(
@@ -154,23 +156,23 @@ class NativeRequestClient {
         ) {
           switch (codings) {
             case COMPRESSION_TYPE.BR:
-              responseBody = responseBody.pipe(zlib.createBrotliDecompress());
+              responseBody = pump(responseBody, zlib.createBrotliDecompress(), onPumpRejected);
               break;
 
             case COMPRESSION_TYPE.GZIP:
             case `x-${COMPRESSION_TYPE.GZIP}`:
-              responseBody = responseBody.pipe(zlib.createGunzip());
+              responseBody = pump(responseBody, zlib.createGunzip(), onPumpRejected);
               break;
 
             case COMPRESSION_TYPE.DEFLATE:
             case `x-${COMPRESSION_TYPE.DEFLATE}`:
-              res.pipe(new PassThrough()).once('data', (chunk) => {
+              pump(res, new PassThrough(), onPumpRejected).once('data', (chunk) => {
                 // see http://stackoverflow.com/questions/37519828
                 // eslint-disable-next-line no-bitwise
                 if ((chunk[0] & 0x0f) === 0x08) {
-                  responseBody = responseBody.pipe(zlib.createInflate());
+                  responseBody = pump(responseBody, zlib.createInflate(), onPumpRejected);
                 } else {
-                  responseBody = responseBody.pipe(zlib.createInflateRaw());
+                  responseBody = pump(responseBody, zlib.createInflateRaw(), onPumpRejected);
                 }
                 resolveResponse();
               });

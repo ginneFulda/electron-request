@@ -1,5 +1,5 @@
 import { URL } from 'url';
-import Stream, { PassThrough } from 'stream';
+import { Stream, PassThrough, pipeline as pump } from 'stream';
 import ElectronAdapter from './ElectronAdapter';
 import { REQUEST_EVENT } from '@/enum';
 import { isRedirect, inElectron } from '@/utils';
@@ -159,11 +159,13 @@ class ElectronRequestClient implements RequestClient {
           onFulfilled(this.send());
         }
 
-        const responseBody = new PassThrough();
-        res.on(RESPONSE_EVENT.ERROR, (error) => responseBody.emit(RESPONSE_EVENT.ERROR, error));
+        const onPumpRejected = (error: NodeJS.ErrnoException | null) => {
+          onRejected(error || new Error('Error occurred while pipe to response'));
+        };
+
+        const responseBody = pump(res, new PassThrough(), onPumpRejected);
         responseBody.on(RESPONSE_EVENT.ERROR, cancelRequest);
         responseBody.on(RESPONSE_EVENT.CANCEL_REQUEST, cancelRequest);
-        res.pipe(responseBody);
 
         onFulfilled(
           new ResponseImpl(responseBody, {

@@ -81,7 +81,7 @@ export default class implements Response {
         if (size && accumBytes + chunk.length > size) {
           abort = true;
           reject(new Error(`Content size at ${requestURL} over limit: ${size}`));
-          this.body.emit('cancel-request');
+          this.body.emit(RESPONSE_EVENT.CANCEL_REQUEST);
           return;
         }
 
