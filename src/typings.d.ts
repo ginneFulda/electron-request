@@ -139,6 +139,10 @@ export interface Response {
   ) => Promise<void>;
 }
 
+export interface RequestClient {
+  send(): Promise<Response>;
+}
+
 export interface DefaultOptions {
   method: string;
   body: string | null | Buffer | Stream;
@@ -146,7 +150,6 @@ export interface DefaultOptions {
   maxRedirectCount: number;
   timeout: number;
   size: number;
-  redirectCount: number;
   useNative: boolean;
   useSessionCookies: boolean;
 }

@@ -1,10 +1,14 @@
 import http from 'http';
+import zlib from 'zlib';
 import https from 'https';
-import Stream from 'stream';
-import RequestClient from './RequestClient';
+import { URL } from 'url';
+import { Stream, PassThrough } from 'stream';
+import ResponseImpl from '@/Response';
+import Headers from '@/Headers';
 import { REQUEST_EVENT } from '@/enum';
-import type { BindRequestEvent } from './RequestClient';
-import type { RequestOptions } from '@/typings.d';
+import { isRedirect } from '@/utils';
+import { HEADER_MAP, METHOD_MAP, COMPRESSION_TYPE, RESPONSE_EVENT } from '@/enum';
+import type { RequestOptions, Response } from '@/typings.d';
 
 const adapterForHttp = (protocol: string) => {
   if (protocol === 'http:') {
@@ -16,17 +20,15 @@ const adapterForHttp = (protocol: string) => {
   throw new TypeError('Only HTTP(S) protocols are supported');
 };
 
-class NativeRequestClient extends RequestClient {
-  private readonly decodeRequired: boolean = true;
-  private clientRequest!: http.ClientRequest;
-  options: RequestOptions;
+class NativeRequestClient {
+  private options: RequestOptions;
+  private redirectCount: number = 0;
 
   constructor(options: RequestOptions) {
-    super();
     this.options = options;
   }
 
-  createRequest = async () => {
+  private createRequest = () => {
     const {
       parsedURL: { protocol, host, hostname, port, pathname, search },
       headers,
@@ -43,42 +45,152 @@ class NativeRequestClient extends RequestClient {
       method,
     };
     // console.log('options: ', options);
-    this.clientRequest = adapterForHttp(protocol).request(options);
+    return adapterForHttp(protocol).request(options);
   };
 
-  cancelRequest = () => {
-    // In node.js, `request.abort()` is deprecated since v14.1.0
-    // Use `request.destroy()` instead.
-    this.clientRequest.destroy();
-  };
+  public send = () => {
+    const {
+      method,
+      followRedirect,
+      maxRedirectCount,
+      requestURL,
+      parsedURL,
+      size,
+      timeout,
+      body: requestBody,
+    } = this.options;
 
-  bindRequestEvent: BindRequestEvent = (onFulfilled, onRejected) => {
-    this.clientRequest.on(REQUEST_EVENT.ERROR, onRejected);
-    this.clientRequest.on(REQUEST_EVENT.ABORT, () => {
-      onRejected(new Error('NodeJS request was aborted by the server'));
+    /** Create NodeJS request */
+    const clientRequest = this.createRequest();
+    /** Cancel NodeJS request */
+    const cancelRequest = () => {
+      // In NodeJS, `request.abort()` is deprecated since v14.1.0. Use `request.destroy()` instead.
+      clientRequest.destroy();
+    };
+    /** Write body to NodeJS request */
+    const writeToRequest = () => {
+      if (requestBody === null) {
+        clientRequest.end();
+      } else if (requestBody instanceof Stream) {
+        requestBody.pipe(clientRequest);
+      } else {
+        clientRequest.write(requestBody);
+        clientRequest.end();
+      }
+    };
+    /** Bind request event */
+    const bindRequestEvent = (
+      onFulfilled: (value: Response | PromiseLike<Response>) => void,
+      onRejected: (reason: Error) => void,
+    ) => {
+      /** Set NodeJS request timeout */
+      if (timeout) {
+        clientRequest.setTimeout(timeout, () => {
+          cancelRequest();
+          onRejected(new Error(`NodeJS request timeout in ${timeout}s`));
+        });
+      }
+
+      /** Bind NodeJS request error event */
+      clientRequest.on(REQUEST_EVENT.ERROR, onRejected);
+
+      /** Bind NodeJS request abort event */
+      clientRequest.on(REQUEST_EVENT.ABORT, () => {
+        onRejected(new Error('NodeJS request was aborted by the server'));
+      });
+
+      /** Bind NodeJS request response event */
+      clientRequest.on(REQUEST_EVENT.RESPONSE, (res) => {
+        const { statusCode = 200, headers: responseHeaders } = res;
+        const headers = new Headers(responseHeaders);
+
+        if (isRedirect(statusCode) && followRedirect) {
+          if (maxRedirectCount && this.redirectCount >= maxRedirectCount) {
+            onRejected(new Error(`Maximum redirect reached at: ${requestURL}`));
+          }
+
+          if (!headers.get(HEADER_MAP.LOCATION)) {
+            onRejected(new Error(`Redirect location header missing at: ${requestURL}`));
+          }
+
+          if (
+            statusCode === 303 ||
+            ((statusCode === 301 || statusCode === 302) && method === METHOD_MAP.POST)
+          ) {
+            this.options.method = METHOD_MAP.GET;
+            this.options.body = null;
+            this.options.headers.delete(HEADER_MAP.CONTENT_LENGTH);
+          }
+
+          this.redirectCount += 1;
+          this.options.parsedURL = new URL(
+            String(headers.get(HEADER_MAP.LOCATION)),
+            parsedURL.toString(),
+          );
+          onFulfilled(this.send());
+        }
+
+        let responseBody = new PassThrough();
+        res.on(RESPONSE_EVENT.ERROR, (error) => responseBody.emit(RESPONSE_EVENT.ERROR, error));
+        responseBody.on(RESPONSE_EVENT.ERROR, cancelRequest);
+        responseBody.on(RESPONSE_EVENT.CANCEL_REQUEST, cancelRequest);
+        res.pipe(responseBody);
+
+        const resolveResponse = () => {
+          onFulfilled(
+            new ResponseImpl(responseBody, {
+              requestURL,
+              statusCode,
+              headers,
+              size,
+            }),
+          );
+        };
+        const codings = headers.get(HEADER_MAP.CONTENT_ENCODING);
+        if (
+          method !== METHOD_MAP.HEAD &&
+          codings !== null &&
+          statusCode !== 204 &&
+          statusCode !== 304
+        ) {
+          switch (codings) {
+            case COMPRESSION_TYPE.BR:
+              responseBody = responseBody.pipe(zlib.createBrotliDecompress());
+              break;
+
+            case COMPRESSION_TYPE.GZIP:
+            case `x-${COMPRESSION_TYPE.GZIP}`:
+              responseBody = responseBody.pipe(zlib.createGunzip());
+              break;
+
+            case COMPRESSION_TYPE.DEFLATE:
+            case `x-${COMPRESSION_TYPE.DEFLATE}`:
+              res.pipe(new PassThrough()).once('data', (chunk) => {
+                // see http://stackoverflow.com/questions/37519828
+                // eslint-disable-next-line no-bitwise
+                if ((chunk[0] & 0x0f) === 0x08) {
+                  responseBody = responseBody.pipe(zlib.createInflate());
+                } else {
+                  responseBody = responseBody.pipe(zlib.createInflateRaw());
+                }
+                resolveResponse();
+              });
+              return;
+            default:
+              break;
+          }
+        }
+        resolveResponse();
+      });
+    };
+
+    return new Promise<Response>((resolve, reject) => {
+      const onRejected = (reason: Error) => {
+        reject(reason);
+      };
+      bindRequestEvent(resolve, onRejected);
+      writeToRequest();
     });
-    this.clientRequest.on(
-      REQUEST_EVENT.RESPONSE,
-      this.createHandleResponse(
-        onFulfilled,
-        onRejected,
-      )({
-        decodeRequired: this.decodeRequired,
-      }),
-    );
-  };
-
-  writeToRequest = () => {
-    const { body: requestBody } = this.options;
-
-    if (requestBody === null) {
-      this.clientRequest.end();
-    } else if (requestBody instanceof Stream) {
-      requestBody.pipe(this.clientRequest);
-    } else {
-      this.clientRequest.write(requestBody);
-      this.clientRequest.end();
-    }
   };
 }
 

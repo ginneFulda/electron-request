@@ -10,8 +10,6 @@ export const DEFAULT_OPTIONS: DefaultOptions = {
   size: 0,
   useSessionCookies: true,
   useNative: false,
-  // redirect count
-  redirectCount: 0,
 };
 
 export const SUPPORTED_COMPRESSIONS = [

@@ -5,8 +5,7 @@ import ElectronRequest from './ElectronRequestClient';
 import NativeRequest from './NativeRequestClient';
 import { DEFAULT_OPTIONS, SUPPORTED_COMPRESSIONS } from '@/constant';
 import { HEADER_MAP, METHOD_MAP } from '@/enum';
-import type RequestClient from './RequestClient';
-import type { RequestConstructorOptions, RequestOptions } from '@/typings.d';
+import type { RequestConstructorOptions, RequestOptions, RequestClient } from '@/typings.d';
 
 const getRequestOptions = (constructorOptions: RequestConstructorOptions): RequestOptions => {
   const options = { ...DEFAULT_OPTIONS, ...constructorOptions };
