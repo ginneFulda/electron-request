@@ -3,6 +3,7 @@ import ElectronAdapter from './ElectronAdapter';
 import RequestClient from './RequestClient';
 import { inElectron } from '@/utils';
 import { REQUEST_EVENT } from '@/enum';
+import type { BindRequestEvent } from './RequestClient';
 import type { ElectronClientRequest } from './ElectronAdapter';
 import type { RequestOptions } from '@/typings.d';
 
@@ -61,14 +62,19 @@ class ElectronRequestClient extends RequestClient {
     this.clientRequest.abort();
   };
 
-  bindRequestEvent = () => {
+  bindRequestEvent: BindRequestEvent = (onFulfilled, onRejected) => {
     const { username, password } = this.options;
 
-    this.clientRequest.on(REQUEST_EVENT.ERROR, this.handleRequestError);
-    this.clientRequest.on(REQUEST_EVENT.ABORT, this.handleRequestAbort);
+    this.clientRequest.on(REQUEST_EVENT.ERROR, onRejected);
+    this.clientRequest.on(REQUEST_EVENT.ABORT, () => {
+      onRejected(new Error('Electron request was aborted by the server'));
+    });
     this.clientRequest.on(
       REQUEST_EVENT.RESPONSE,
-      this.createHandleResponse({
+      this.createHandleResponse(
+        onFulfilled,
+        onRejected,
+      )({
         decodeRequired: this.decodeRequired,
       }),
     );
@@ -77,7 +83,7 @@ class ElectronRequestClient extends RequestClient {
         callback(username, password);
       } else {
         this.cancelRequest();
-        this.reject(
+        onRejected(
           new Error(`Login event received from ${authInfo.host} but no credentials provided`),
         );
       }

@@ -3,6 +3,7 @@ import https from 'https';
 import Stream from 'stream';
 import RequestClient from './RequestClient';
 import { REQUEST_EVENT } from '@/enum';
+import type { BindRequestEvent } from './RequestClient';
 import type { RequestOptions } from '@/typings.d';
 
 const adapterForHttp = (protocol: string) => {
@@ -51,12 +52,17 @@ class NativeRequestClient extends RequestClient {
     this.clientRequest.destroy();
   };
 
-  bindRequestEvent = () => {
-    this.clientRequest.on(REQUEST_EVENT.ERROR, this.handleRequestError);
-    this.clientRequest.on(REQUEST_EVENT.ABORT, this.handleRequestAbort);
+  bindRequestEvent: BindRequestEvent = (onFulfilled, onRejected) => {
+    this.clientRequest.on(REQUEST_EVENT.ERROR, onRejected);
+    this.clientRequest.on(REQUEST_EVENT.ABORT, () => {
+      onRejected(new Error('NodeJS request was aborted by the server'));
+    });
     this.clientRequest.on(
       REQUEST_EVENT.RESPONSE,
-      this.createHandleResponse({
+      this.createHandleResponse(
+        onFulfilled,
+        onRejected,
+      )({
         decodeRequired: this.decodeRequired,
       }),
     );

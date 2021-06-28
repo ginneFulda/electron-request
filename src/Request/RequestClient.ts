@@ -8,19 +8,21 @@ import { HEADER_MAP, METHOD_MAP, COMPRESSION_TYPE, RESPONSE_EVENT } from '@/enum
 import type { IncomingMessage } from 'http';
 import type { RequestOptions, Response } from '@/typings.d';
 
-type CreateHandleResponse = (options: {
-  decodeRequired: boolean;
-}) => (response: IncomingMessage) => void;
+export type BindRequestEvent = (
+  onFulfilled: (value: Response | PromiseLike<Response>) => void,
+  onRejected: (reason: Error) => void,
+) => void;
+
+type CreateHandleResponse = (
+  ...args: Parameters<BindRequestEvent>
+) => (options: { decodeRequired: boolean }) => (response: IncomingMessage) => void;
 
 abstract class RequestClient {
   protected abstract createRequest(): Promise<void>;
-  protected abstract bindRequestEvent(): void;
+  protected abstract bindRequestEvent: BindRequestEvent;
   protected abstract writeToRequest(): void;
   protected abstract cancelRequest(): void;
   protected abstract options: RequestOptions;
-
-  protected resolve!: (value: Response | PromiseLike<Response>) => void;
-  protected reject!: (reason?: unknown) => void;
   private timeoutId: NodeJS.Timeout | null = null;
 
   private clearRequestTimeout = () => {
@@ -29,17 +31,7 @@ abstract class RequestClient {
     this.timeoutId = null;
   };
 
-  protected handleRequestError = (error: Error) => {
-    this.clearRequestTimeout();
-    this.reject(error);
-  };
-
-  protected handleRequestAbort = () => {
-    this.clearRequestTimeout();
-    this.reject(new Error('Request was aborted by the server'));
-  };
-
-  protected createHandleResponse: CreateHandleResponse = (options) => {
+  protected createHandleResponse: CreateHandleResponse = (onFulfilled, onRejected) => (options) => {
     const { decodeRequired } = options;
     return (res) => {
       const {
@@ -58,11 +50,11 @@ abstract class RequestClient {
 
       if (isRedirect(statusCode) && followRedirect) {
         if (maxRedirectCount && redirectCount >= maxRedirectCount) {
-          this.reject(new Error(`Maximum redirect reached at: ${requestURL}`));
+          onRejected(new Error(`Maximum redirect reached at: ${requestURL}`));
         }
 
         if (!headers.get(HEADER_MAP.LOCATION)) {
-          this.reject(new Error(`Redirect location header missing at: ${requestURL}`));
+          onRejected(new Error(`Redirect location header missing at: ${requestURL}`));
         }
 
         if (
@@ -79,7 +71,7 @@ abstract class RequestClient {
           String(headers.get(HEADER_MAP.LOCATION)),
           parsedURL.toString(),
         );
-        this.resolve(this.send());
+        onFulfilled(this.send());
       }
 
       let responseBody = new PassThrough();
@@ -89,7 +81,7 @@ abstract class RequestClient {
       res.pipe(responseBody);
 
       const resolveResponse = () => {
-        this.resolve(
+        onFulfilled(
           new ResponseImpl(responseBody, {
             requestURL,
             statusCode,
@@ -144,17 +136,20 @@ abstract class RequestClient {
     await this.createRequest();
     return new Promise<Response>((resolve, reject) => {
       const { timeout } = this.options;
-      this.resolve = resolve;
-      this.reject = reject;
 
       if (timeout) {
         this.timeoutId = setTimeout(() => {
-          reject(new Error(`Network timeout in ${timeout}s`));
           this.cancelRequest();
+          reject(new Error(`Network timeout in ${timeout}s`));
         }, timeout);
       }
 
-      this.bindRequestEvent();
+      const onRejected = (reason: Error) => {
+        this.clearRequestTimeout();
+        reject(reason);
+      };
+
+      this.bindRequestEvent(resolve, onRejected);
       this.writeToRequest();
     });
   };
