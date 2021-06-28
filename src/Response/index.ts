@@ -93,7 +93,7 @@ export default class implements Response {
         if (abort) {
           return;
         }
-        resolve(Buffer.concat(accum));
+        resolve(Buffer.concat(accum, accumBytes));
       });
     });
   };

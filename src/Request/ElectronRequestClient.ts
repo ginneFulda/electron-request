@@ -164,7 +164,6 @@ class ElectronRequestClient implements RequestClient {
         };
 
         const responseBody = pump(res, new PassThrough(), onPumpRejected);
-        responseBody.on(RESPONSE_EVENT.ERROR, cancelRequest);
         responseBody.on(RESPONSE_EVENT.CANCEL_REQUEST, cancelRequest);
 
         onFulfilled(
