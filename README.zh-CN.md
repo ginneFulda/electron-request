@@ -14,7 +14,7 @@ electron-request 在 Electron 环境下使用其内置的 net 模块，在 Node.
 
 - 零依赖，足够轻量
 - 快速上手，类似 window.fetch 的使用方式
-- 不需要引入额外库，支持文件下载进度功能
+- 不需要引入额外库，支持文件下载进度功能和文件校验功能
 - 支持在 Electron 或 Node.js 上运行，优先使用 Electron 的 net 模块
 - 统一的错误处理
 
@@ -94,6 +94,11 @@ void (async () => {
      * @default 0
      */
     size?: number;
+    /**
+     * Whether to use nodejs native request
+     * @default false
+     */
+    useNative?: boolean;
 
     // Docs: https://www.electronjs.org/docs/api/client-request#new-clientrequestoptions
 
@@ -123,14 +128,10 @@ void (async () => {
 interface Response {
   /** Convenience property representing if the request ended normally */
   ok: boolean;
+  /** Response headers */
+  headers: Record<string, string | string[]>;
   /** Return origin stream */
   stream: Stream;
-  /**
-   * Download file to destination
-   * @param {WriteStream} dest  Download write stream
-   * @param {ProgressCallback=} onProgress Download progress callback
-   */
-  download: (dest: WriteStream, onProgress?: ProgressCallback) => Promise<void>;
   /** Decode response as ArrayBuffer */
   arrayBuffer(): Promise<ArrayBuffer>;
   /** Decode response as Blob */
@@ -141,6 +142,17 @@ interface Response {
   json<T>(): Promise<T>;
   /** Decode response as buffer */
   buffer(): Promise<Buffer>;
+  /**
+   * Download file to destination
+   * @param {Writable} destination Writable destination stream
+   * @param {ProgressCallback=} onProgress Download progress callback
+   * @param {ValidateOptions=} validateOptions Validate options
+   */
+  download: (
+    destination: Writable,
+    onProgress?: ProgressCallback,
+    validateOptions?: ValidateOptions,
+  ) => Promise<void>;
 }
 
 /** Download progress information */

@@ -14,7 +14,7 @@ Net module is used in electron to better support proxy, authentication, traffic 
 
 - Zero-dependency, Lightweight
 - Quick start, similar window.fetch
-- No need to import other libraries, support file download progress
+- No need to import other libraries, support file download progress and file verification
 - Support to run on Electron or Node.js, use Electron's net module first
 - Unified error handling
 
@@ -69,7 +69,7 @@ void (async () => {
     /**
      * Request headers
      */
-    headers?: Record<string, string>;
+    headers?: Record<string, string | string[]>;
     /**
      * Request query
      */
@@ -94,6 +94,11 @@ void (async () => {
      * @default 0
      */
     size?: number;
+    /**
+     * Whether to use nodejs native request
+     * @default false
+     */
+    useNative?: boolean;
 
     // Docs: https://www.electronjs.org/docs/api/client-request#new-clientrequestoptions
 
@@ -107,6 +112,7 @@ void (async () => {
     password?: string;
     /**
      * Only in Electron. Whether to send cookies with this request from the provided session
+     * @default true
      */
     useSessionCookies?: boolean;
     /**
@@ -123,14 +129,10 @@ void (async () => {
 interface Response {
   /** Convenience property representing if the request ended normally */
   ok: boolean;
+  /** Response headers */
+  headers: Record<string, string | string[]>;
   /** Return origin stream */
   stream: Stream;
-  /**
-   * Download file to destination
-   * @param {WriteStream} dest  Download write stream
-   * @param {ProgressCallback=} onProgress Download progress callback
-   */
-  download: (dest: WriteStream, onProgress?: ProgressCallback) => Promise<void>;
   /** Decode response as ArrayBuffer */
   arrayBuffer(): Promise<ArrayBuffer>;
   /** Decode response as Blob */
@@ -141,6 +143,17 @@ interface Response {
   json<T>(): Promise<T>;
   /** Decode response as buffer */
   buffer(): Promise<Buffer>;
+  /**
+   * Download file to destination
+   * @param {Writable} destination Writable destination stream
+   * @param {ProgressCallback=} onProgress Download progress callback
+   * @param {ValidateOptions=} validateOptions Validate options
+   */
+  download: (
+    destination: Writable,
+    onProgress?: ProgressCallback,
+    validateOptions?: ValidateOptions,
+  ) => Promise<void>;
 }
 
 /** Download progress information */
