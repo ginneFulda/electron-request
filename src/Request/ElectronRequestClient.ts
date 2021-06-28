@@ -103,7 +103,6 @@ class ElectronRequestClient implements RequestClient {
       /** Set electron request timeout */
       if (timeout) {
         this.timeoutId = setTimeout(() => {
-          cancelRequest();
           onRejected(new Error(`Electron request timeout in ${timeout}s`));
         }, timeout);
       }
@@ -121,7 +120,6 @@ class ElectronRequestClient implements RequestClient {
         if (username && password) {
           callback(username, password);
         } else {
-          cancelRequest();
           onRejected(
             new Error(`Login event received from ${authInfo.host} but no credentials provided`),
           );
@@ -181,6 +179,7 @@ class ElectronRequestClient implements RequestClient {
     return new Promise<Response>((resolve, reject) => {
       const onRejected = (reason: Error) => {
         this.clearRequestTimeout();
+        cancelRequest();
         reject(reason);
       };
       bindRequestEvent(resolve, onRejected);

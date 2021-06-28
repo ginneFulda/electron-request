@@ -86,7 +86,6 @@ class NativeRequestClient {
       /** Set NodeJS request timeout */
       if (timeout) {
         clientRequest.setTimeout(timeout, () => {
-          cancelRequest();
           onRejected(new Error(`NodeJS request timeout in ${timeout}s`));
         });
       }
@@ -186,6 +185,7 @@ class NativeRequestClient {
 
     return new Promise<Response>((resolve, reject) => {
       const onRejected = (reason: Error) => {
+        cancelRequest();
         reject(reason);
       };
       bindRequestEvent(resolve, onRejected);
