@@ -22,9 +22,9 @@ export default class ProgressCallbackTransform extends Transform {
     this.transferred += chunkLength;
     this.delta += chunkLength;
 
-    if (this.total >= chunkLength) {
+    if (this.total >= this.transferred) {
       const now = Date.now();
-      if (now >= this.nextUpdate && this.transferred !== this.total) {
+      if (now >= this.nextUpdate) {
         this.nextUpdate = now + 1000;
         this.onProgress({
           total: this.total,
