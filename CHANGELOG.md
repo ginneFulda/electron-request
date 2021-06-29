@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/islizeqiang/electron-request/compare/v1.5.0...v1.6.0) (2021-06-29)
+
+### Bug Fixes
+
+- electron environment judgment ([fb23475](https://github.com/islizeqiang/electron-request/commit/fb234755b30f6ff149d3c95d69e02a303debc1ff))
+- progress transform size problem ([f3a0b99](https://github.com/islizeqiang/electron-request/commit/f3a0b999301a694644ff21a08e8712b579ecd0a7))
+
 ## [1.5.0](https://github.com/islizeqiang/electron-request/compare/v1.4.0...v1.5.0) (2021-06-28)
 
 ### Features
