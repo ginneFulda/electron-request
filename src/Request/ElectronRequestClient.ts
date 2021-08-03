@@ -53,9 +53,13 @@ class ElectronRequestClient implements RequestClient {
     // console.log('options: ', options);
     const clientRequest = this.electronAdapter.request(options);
 
-    for (const [key, headerValues] of Object.entries(headers.raw())) {
-      for (const headerValue of headerValues) {
-        clientRequest.setHeader(key, headerValue);
+    for (const [key, value] of Object.entries(headers.raw())) {
+      if (Array.isArray(value)) {
+        for (const v of value) {
+          clientRequest.setHeader(key, v);
+        }
+      } else {
+        clientRequest.setHeader(key, value);
       }
     }
 
@@ -102,7 +106,7 @@ class ElectronRequestClient implements RequestClient {
       /** Set electron request timeout */
       if (timeout) {
         this.timeoutId = setTimeout(() => {
-          onRejected(new Error(`Electron request timeout in ${timeout}s`));
+          onRejected(new Error(`Electron request timeout in ${timeout} ms`));
         }, timeout);
       }
 
