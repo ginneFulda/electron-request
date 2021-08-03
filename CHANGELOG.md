@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/islizeqiang/electron-request/compare/v1.6.0...v1.7.0) (2021-08-03)
+
+### Bug Fixes
+
+- clientRequest set header ([f2912d3](https://github.com/islizeqiang/electron-request/commit/f2912d37f471b5807fb1cc0a4f9b055ab132cc08))
+- timeout unit ([09863a0](https://github.com/islizeqiang/electron-request/commit/09863a0278b8e051f25a24adced967ad6fb9e10b))
+
 ## [1.6.0](https://github.com/islizeqiang/electron-request/compare/v1.5.0...v1.6.0) (2021-06-29)
 
 ### Bug Fixes
