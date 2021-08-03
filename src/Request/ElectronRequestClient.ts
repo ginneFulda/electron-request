@@ -102,7 +102,7 @@ class ElectronRequestClient implements RequestClient {
       /** Set electron request timeout */
       if (timeout) {
         this.timeoutId = setTimeout(() => {
-          onRejected(new Error(`Electron request timeout in ${timeout}s`));
+          onRejected(new Error(`Electron request timeout in ${timeout} ms`));
         }, timeout);
       }
 

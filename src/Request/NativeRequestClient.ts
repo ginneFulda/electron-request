@@ -86,7 +86,7 @@ class NativeRequestClient {
       /** Set NodeJS request timeout */
       if (timeout) {
         clientRequest.setTimeout(timeout, () => {
-          onRejected(new Error(`NodeJS request timeout in ${timeout}s`));
+          onRejected(new Error(`NodeJS request timeout in ${timeout} ms`));
         });
       }
 
