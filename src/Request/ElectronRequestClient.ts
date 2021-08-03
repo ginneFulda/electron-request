@@ -53,9 +53,13 @@ class ElectronRequestClient implements RequestClient {
     // console.log('options: ', options);
     const clientRequest = this.electronAdapter.request(options);
 
-    for (const [key, headerValues] of Object.entries(headers.raw())) {
-      for (const headerValue of headerValues) {
-        clientRequest.setHeader(key, headerValue);
+    for (const [key, value] of Object.entries(headers.raw())) {
+      if (Array.isArray(value)) {
+        for (const v of value) {
+          clientRequest.setHeader(key, v);
+        }
+      } else {
+        clientRequest.setHeader(key, value);
       }
     }
 
