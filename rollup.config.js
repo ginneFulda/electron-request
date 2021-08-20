@@ -22,7 +22,7 @@ export default [
     plugins: [resolveTypescriptPaths(), typescript()],
     output: [
       { file: pkgConfig.module, format: 'es' },
-      { file: pkgConfig.main, format: 'cjs', exports: 'named' },
+      { file: pkgConfig.main, format: 'cjs', exports: 'auto' },
     ],
     external,
   },
