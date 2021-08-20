@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/islizeqiang/electron-request/compare/v1.7.0...v1.7.1) (2021-08-20)
+
+### Bug Fixes
+
+- export bug when use Rollup to output commonjs([#2](https://github.com/islizeqiang/electron-request/issues/2)) ([78b7e30](https://github.com/islizeqiang/electron-request/commit/78b7e30c6d371c3d7abba253d1497c0665dd1752))
+
 ## [1.7.0](https://github.com/islizeqiang/electron-request/compare/v1.6.0...v1.7.0) (2021-08-03)
 
 ### Bug Fixes
