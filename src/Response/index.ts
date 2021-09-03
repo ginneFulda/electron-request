@@ -99,7 +99,7 @@ export default class implements Response {
   };
 
   /**
-   * Convenience property representing if the request ended normally
+   * Whether the response was successful (status in the range 200-299)
    */
   get ok(): boolean {
     const { statusCode } = this.config;
