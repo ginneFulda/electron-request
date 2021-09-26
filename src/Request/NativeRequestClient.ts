@@ -129,11 +129,13 @@ class NativeRequestClient {
           onFulfilled(this.send());
         }
 
-        const onPumpRejected = (error: NodeJS.ErrnoException | null) => {
-          onRejected(error || new Error('Error occurred while pipe to response'));
+        const pumpCallback = (error: NodeJS.ErrnoException | null) => {
+          if (error !== null) {
+            onRejected(error);
+          }
         };
 
-        let responseBody = pump(res, new PassThrough(), onPumpRejected);
+        let responseBody = pump(res, new PassThrough(), pumpCallback);
         responseBody.on(RESPONSE_EVENT.CANCEL_REQUEST, cancelRequest);
 
         const resolveResponse = () => {
@@ -155,23 +157,23 @@ class NativeRequestClient {
         ) {
           switch (codings) {
             case COMPRESSION_TYPE.BR:
-              responseBody = pump(responseBody, zlib.createBrotliDecompress(), onPumpRejected);
+              responseBody = pump(responseBody, zlib.createBrotliDecompress(), pumpCallback);
               break;
 
             case COMPRESSION_TYPE.GZIP:
             case `x-${COMPRESSION_TYPE.GZIP}`:
-              responseBody = pump(responseBody, zlib.createGunzip(), onPumpRejected);
+              responseBody = pump(responseBody, zlib.createGunzip(), pumpCallback);
               break;
 
             case COMPRESSION_TYPE.DEFLATE:
             case `x-${COMPRESSION_TYPE.DEFLATE}`:
-              pump(res, new PassThrough(), onPumpRejected).once('data', (chunk) => {
+              pump(res, new PassThrough(), pumpCallback).once('data', (chunk) => {
                 // see http://stackoverflow.com/questions/37519828
                 // eslint-disable-next-line no-bitwise
                 if ((chunk[0] & 0x0f) === 0x08) {
-                  responseBody = pump(responseBody, zlib.createInflate(), onPumpRejected);
+                  responseBody = pump(responseBody, zlib.createInflate(), pumpCallback);
                 } else {
-                  responseBody = pump(responseBody, zlib.createInflateRaw(), onPumpRejected);
+                  responseBody = pump(responseBody, zlib.createInflateRaw(), pumpCallback);
                 }
                 resolveResponse();
               });

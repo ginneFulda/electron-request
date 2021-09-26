@@ -162,11 +162,12 @@ class ElectronRequestClient implements RequestClient {
           onFulfilled(this.send());
         }
 
-        const onPumpRejected = (error: NodeJS.ErrnoException | null) => {
-          onRejected(error || new Error('Error occurred while pipe to response'));
-        };
+        const responseBody = pump(res, new PassThrough(), (error) => {
+          if (error !== null) {
+            onRejected(error);
+          }
+        });
 
-        const responseBody = pump(res, new PassThrough(), onPumpRejected);
         responseBody.on(RESPONSE_EVENT.CANCEL_REQUEST, cancelRequest);
 
         onFulfilled(
