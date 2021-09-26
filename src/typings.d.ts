@@ -110,7 +110,7 @@ export interface ValidateOptions {
 }
 
 export interface Response {
-  /** Convenience property representing if the request ended normally */
+  /** Whether the response was successful (status in the range 200-299) */
   ok: boolean;
   /** Response headers */
   headers: Record<string, string | string[]>;
