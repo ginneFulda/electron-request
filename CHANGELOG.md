@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.2](https://github.com/islizeqiang/electron-request/compare/v1.7.1...v1.7.2) (2021-09-26)
+
+### Bug Fixes
+
+- error in stream.pipeline using ([2bb0e5d](https://github.com/islizeqiang/electron-request/commit/2bb0e5ddb0ff9a5ccb29829033bdb392137d7a22))
+
 ### [1.7.1](https://github.com/islizeqiang/electron-request/compare/v1.7.0...v1.7.1) (2021-08-20)
 
 ### Bug Fixes
