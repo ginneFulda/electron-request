@@ -46,7 +46,7 @@ class DigestTransform extends Transform {
       try {
         this.validate();
       } catch (e) {
-        callback(e);
+        callback(e as Error);
         return;
       }
     }

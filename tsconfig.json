@@ -5,6 +5,7 @@
     "strict": true,
     "lib": ["esnext", "dom"],
     "allowSyntheticDefaultImports": true,
+    "importHelpers": true,
     "isolatedModules": false,
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -22,5 +23,5 @@
     }
   },
   "include": ["src"],
-  "exclude": ["scripts", "dist"]
+  "exclude": ["dist"]
 }
