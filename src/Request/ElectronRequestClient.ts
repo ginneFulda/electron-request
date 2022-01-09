@@ -93,6 +93,7 @@ class ElectronRequestClient implements RequestClient {
       if (requestBody === null) {
         clientRequest.end();
       } else if (requestBody instanceof Stream) {
+        // TODO remove as
         requestBody.pipe(new PassThrough()).pipe(clientRequest as unknown as Writable);
       } else {
         clientRequest.write(requestBody);
