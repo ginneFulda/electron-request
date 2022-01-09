@@ -6,6 +6,7 @@ import { isRedirect, inElectron } from '@/utils';
 import ResponseImpl from '@/Response';
 import Headers from '@/Headers';
 import { HEADER_MAP, METHOD_MAP, RESPONSE_EVENT } from '@/enum';
+import type { Writable } from 'stream';
 import type { RequestOptions, RequestClient, Response } from '@/typings.d';
 
 class ElectronRequestClient implements RequestClient {
@@ -92,7 +93,7 @@ class ElectronRequestClient implements RequestClient {
       if (requestBody === null) {
         clientRequest.end();
       } else if (requestBody instanceof Stream) {
-        requestBody.pipe(new PassThrough()).pipe(clientRequest);
+        requestBody.pipe(new PassThrough()).pipe(clientRequest as unknown as Writable);
       } else {
         clientRequest.write(requestBody);
         clientRequest.end();
