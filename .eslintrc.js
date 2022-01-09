@@ -1,5 +1,8 @@
 module.exports = {
-  extends: [require.resolve('code-fabric/eslint')],
+  extends: [
+    require.resolve('code-fabric/eslint-base'),
+    require.resolve('code-fabric/eslint-typescript'),
+  ],
   rules: {
     'max-classes-per-file': 0,
     'no-restricted-syntax': 0,
