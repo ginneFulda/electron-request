@@ -115,7 +115,6 @@ export const checkIsHttpToken = (val: unknown) => {
  * so take care when making changes to the implementation so that the source
  * code size does not exceed v8's default max_inlined_source_size setting.
  * */
-//
 export const checkInvalidHeaderChar = (val: string) => {
   if (val.length < 1) {
     return false;

@@ -8,7 +8,7 @@ import Headers from '@/Headers';
 import { REQUEST_EVENT } from '@/enum';
 import { isRedirect } from '@/utils';
 import { HEADER_MAP, METHOD_MAP, COMPRESSION_TYPE, RESPONSE_EVENT } from '@/enum';
-import type { RequestOptions, Response } from '@/typings.d';
+import type { RequestClient, RequestOptions, Response } from '@/typings.d';
 
 const adapterForHttp = (protocol: string) => {
   if (protocol === 'http:') {
@@ -20,7 +20,7 @@ const adapterForHttp = (protocol: string) => {
   throw new TypeError('Only HTTP(S) protocols are supported');
 };
 
-class NativeRequestClient {
+class NativeRequestClient implements RequestClient {
   private options: RequestOptions;
   private redirectCount: number = 0;
 
