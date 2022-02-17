@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/islizeqiang/electron-request/compare/v1.8.0...v1.8.1) (2022-02-17)
+
+### Features
+
+- update devDependencies ([19f6c0b](https://github.com/islizeqiang/electron-request/commit/19f6c0bb46e8fd7856a817cf3d3c2c92223de379))
+
+### Bug Fixes
+
+- move the path parameter to the url to fit the options of the electron request ([7061d16](https://github.com/islizeqiang/electron-request/commit/7061d168dc91988beda62c58eb1ab3a72dc20af5))
+
 ## [1.8.0](https://github.com/islizeqiang/electron-request/compare/v1.7.2...v1.8.0) (2021-12-22)
 
 ### [1.7.2](https://github.com/islizeqiang/electron-request/compare/v1.7.1...v1.7.2) (2021-09-26)
