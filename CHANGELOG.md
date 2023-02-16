@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.2](https://github.com/ZacharyL2/electron-request/compare/v1.8.1...v1.8.2) (2023-02-16)
+
+### Bug Fixes
+
+- electron request options ([255ab78](https://github.com/ZacharyL2/electron-request/commit/255ab784295e630db7ce1147b2844b432c43a9d5))
+- use latest query value and encode query options ([9b1cf79](https://github.com/ZacharyL2/electron-request/commit/9b1cf79d2bfc0491bb9d7dcf52a46aa6b1f29f78))
+
 ### [1.8.1](https://github.com/islizeqiang/electron-request/compare/v1.8.0...v1.8.1) (2022-02-17)
 
 ### Features
