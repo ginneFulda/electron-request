@@ -30,7 +30,9 @@ export default class implements Response {
     const { requestURL, size } = this.config;
 
     if (this.disturbed) {
-      return Promise.reject(new Error(`Response used already for: ${requestURL}`));
+      return Promise.reject(
+        new Error(`Response used already for: ${requestURL}`),
+      );
     }
 
     this.disturbed = true;
@@ -69,7 +71,9 @@ export default class implements Response {
       // handle stream error, such as incorrect content-encoding
       this.body.on(RESPONSE_EVENT.ERROR, (err) => {
         reject(
-          new Error(`Invalid response body while trying to fetch ${requestURL}: ${err.message}`),
+          new Error(
+            `Invalid response body while trying to fetch ${requestURL}: ${err.message}`,
+          ),
         );
       });
 
@@ -80,7 +84,9 @@ export default class implements Response {
 
         if (size && accumBytes + chunk.length > size) {
           abort = true;
-          reject(new Error(`Content size at ${requestURL} over limit: ${size}`));
+          reject(
+            new Error(`Content size at ${requestURL} over limit: ${size}`),
+          );
           this.body.emit(RESPONSE_EVENT.CANCEL_REQUEST);
           return;
         }
@@ -123,8 +129,12 @@ export default class implements Response {
     const feedStreams: Writable[] = [];
 
     if (typeof onProgress === 'function') {
-      const contentLength = Number(this.config.headers.get(HEADER_MAP.CONTENT_LENGTH));
-      feedStreams.push(new ProgressCallbackTransform(contentLength, onProgress));
+      const contentLength = Number(
+        this.config.headers.get(HEADER_MAP.CONTENT_LENGTH),
+      );
+      feedStreams.push(
+        new ProgressCallbackTransform(contentLength, onProgress),
+      );
     }
 
     if (validateOptions) {
@@ -143,7 +153,10 @@ export default class implements Response {
       }
 
       fileOut.once('finish', () => {
-        if (fileOut instanceof WriteStream && typeof fileOut.close === 'function') {
+        if (
+          fileOut instanceof WriteStream &&
+          typeof fileOut.close === 'function'
+        ) {
           fileOut.close();
         }
         resolve();

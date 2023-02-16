@@ -17,7 +17,9 @@ class BlobImpl implements Blob {
         blobParts instanceof Date ||
         blobParts instanceof RegExp
       ) {
-        throw new TypeError('Blob parts must be objects that are not Dates or RegExps');
+        throw new TypeError(
+          'Blob parts must be objects that are not Dates or RegExps',
+        );
       }
 
       for (let i = 0, l = Number(blobParts.length); i < l; i += 1) {
@@ -31,7 +33,9 @@ class BlobImpl implements Blob {
         } else if (part instanceof BlobImpl) {
           buf = part.buffer;
         } else if (ArrayBuffer.isView(part)) {
-          buf = Buffer.from(new Uint8Array(part.buffer, part.byteOffset, part.byteLength));
+          buf = Buffer.from(
+            new Uint8Array(part.buffer, part.byteOffset, part.byteLength),
+          );
         } else {
           buf = Buffer.from(typeof part === 'string' ? part : String(part));
         }
@@ -41,7 +45,8 @@ class BlobImpl implements Blob {
 
     this.buffer = Buffer.concat(buffers);
     this.closed = false;
-    const type = options && options.type !== undefined && String(options.type).toLowerCase();
+    const type =
+      options?.type !== undefined && String(options.type).toLowerCase();
 
     if (type && !/[^\u0020-\u007E]/.test(type)) {
       this.privateType = type;

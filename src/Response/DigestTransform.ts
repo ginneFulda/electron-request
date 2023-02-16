@@ -33,7 +33,11 @@ class DigestTransform extends Transform {
   }
 
   // noinspection JSUnusedGlobalSymbols
-  _transform(chunk: Buffer, encoding: BufferEncoding, callback: TransformCallback) {
+  _transform(
+    chunk: Buffer,
+    encoding: BufferEncoding,
+    callback: TransformCallback,
+  ) {
     this.digester.update(chunk);
     callback(null, chunk);
   }

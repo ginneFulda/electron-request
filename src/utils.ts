@@ -5,7 +5,7 @@ export const inElectron = (() => {
   try {
     // eslint-disable-next-line global-require
     const electron = require('electron');
-    return Boolean(electron && electron.app);
+    return Boolean(electron?.app);
   } catch {
     return false;
   }
@@ -20,7 +20,9 @@ export const extractContentType = (body: unknown): string | null => {
 
 export const isRedirect = (code: number | undefined) => {
   if (typeof code !== 'number') return false;
-  return code === 301 || code === 302 || code === 303 || code === 307 || code === 308;
+  return (
+    code === 301 || code === 302 || code === 303 || code === 307 || code === 308
+  );
 };
 
 /**

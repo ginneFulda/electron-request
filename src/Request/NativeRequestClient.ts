@@ -7,7 +7,12 @@ import ResponseImpl from '@/Response';
 import Headers from '@/Headers';
 import { REQUEST_EVENT } from '@/enum';
 import { isRedirect } from '@/utils';
-import { HEADER_MAP, METHOD_MAP, COMPRESSION_TYPE, RESPONSE_EVENT } from '@/enum';
+import {
+  HEADER_MAP,
+  METHOD_MAP,
+  COMPRESSION_TYPE,
+  RESPONSE_EVENT,
+} from '@/enum';
 import type { RequestClient, RequestOptions, Response } from '@/typings.d';
 
 const adapterForHttp = (protocol: string) => {
@@ -109,12 +114,15 @@ class NativeRequestClient implements RequestClient {
           }
 
           if (!headers.get(HEADER_MAP.LOCATION)) {
-            onRejected(new Error(`Redirect location header missing at: ${requestURL}`));
+            onRejected(
+              new Error(`Redirect location header missing at: ${requestURL}`),
+            );
           }
 
           if (
             statusCode === 303 ||
-            ((statusCode === 301 || statusCode === 302) && method === METHOD_MAP.POST)
+            ((statusCode === 301 || statusCode === 302) &&
+              method === METHOD_MAP.POST)
           ) {
             this.options.method = METHOD_MAP.GET;
             this.options.body = null;
@@ -157,26 +165,45 @@ class NativeRequestClient implements RequestClient {
         ) {
           switch (codings) {
             case COMPRESSION_TYPE.BR:
-              responseBody = pump(responseBody, zlib.createBrotliDecompress(), pumpCallback);
+              responseBody = pump(
+                responseBody,
+                zlib.createBrotliDecompress(),
+                pumpCallback,
+              );
               break;
 
             case COMPRESSION_TYPE.GZIP:
             case `x-${COMPRESSION_TYPE.GZIP}`:
-              responseBody = pump(responseBody, zlib.createGunzip(), pumpCallback);
+              responseBody = pump(
+                responseBody,
+                zlib.createGunzip(),
+                pumpCallback,
+              );
               break;
 
             case COMPRESSION_TYPE.DEFLATE:
             case `x-${COMPRESSION_TYPE.DEFLATE}`:
-              pump(res, new PassThrough(), pumpCallback).once('data', (chunk) => {
-                // see http://stackoverflow.com/questions/37519828
-                // eslint-disable-next-line no-bitwise
-                if ((chunk[0] & 0x0f) === 0x08) {
-                  responseBody = pump(responseBody, zlib.createInflate(), pumpCallback);
-                } else {
-                  responseBody = pump(responseBody, zlib.createInflateRaw(), pumpCallback);
-                }
-                resolveResponse();
-              });
+              pump(res, new PassThrough(), pumpCallback).once(
+                'data',
+                (chunk) => {
+                  // see http://stackoverflow.com/questions/37519828
+                  // eslint-disable-next-line no-bitwise
+                  if ((chunk[0] & 0x0f) === 0x08) {
+                    responseBody = pump(
+                      responseBody,
+                      zlib.createInflate(),
+                      pumpCallback,
+                    );
+                  } else {
+                    responseBody = pump(
+                      responseBody,
+                      zlib.createInflateRaw(),
+                      pumpCallback,
+                    );
+                  }
+                  resolveResponse();
+                },
+              );
               return;
             default:
               break;

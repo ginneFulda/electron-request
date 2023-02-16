@@ -12,8 +12,15 @@ interface AuthInfo {
 
 export interface ElectronClientRequest extends EventEmitter {
   writable: boolean;
-  write(buffer: Uint8Array | string, cb?: (err?: Error | null) => void): boolean;
-  write(str: string, encoding?: BufferEncoding, cb?: (err?: Error | null) => void): boolean;
+  write(
+    buffer: Uint8Array | string,
+    cb?: (err?: Error | null) => void,
+  ): boolean;
+  write(
+    str: string,
+    encoding?: BufferEncoding,
+    cb?: (err?: Error | null) => void,
+  ): boolean;
   end(cb?: () => void): void;
   end(data: string | Uint8Array, cb?: () => void): void;
   end(str: string, encoding?: BufferEncoding, cb?: () => void): void;

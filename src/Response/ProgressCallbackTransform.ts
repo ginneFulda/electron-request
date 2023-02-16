@@ -17,7 +17,11 @@ export default class ProgressCallbackTransform extends Transform {
     this.onProgress = onProgress;
   }
 
-  _transform(chunk: Buffer, encoding: BufferEncoding, callback: TransformCallback) {
+  _transform(
+    chunk: Buffer,
+    encoding: BufferEncoding,
+    callback: TransformCallback,
+  ) {
     const chunkLength = chunk.length;
     this.transferred += chunkLength;
     this.delta += chunkLength;
@@ -31,7 +35,9 @@ export default class ProgressCallbackTransform extends Transform {
           delta: this.delta,
           transferred: this.transferred,
           percent: (this.transferred / this.total) * 100,
-          bytesPerSecond: Math.round(this.transferred / ((now - this.start) / 1000)),
+          bytesPerSecond: Math.round(
+            this.transferred / ((now - this.start) / 1000),
+          ),
         });
         this.delta = 0;
       }
@@ -49,7 +55,9 @@ export default class ProgressCallbackTransform extends Transform {
       delta: this.delta,
       transferred: totalChunk,
       percent: 100,
-      bytesPerSecond: Math.round(this.transferred / ((Date.now() - this.start) / 1000)),
+      bytesPerSecond: Math.round(
+        this.transferred / ((Date.now() - this.start) / 1000),
+      ),
     });
     this.delta = 0;
 

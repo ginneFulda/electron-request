@@ -58,7 +58,9 @@ class Headers {
   public has = (key: string) => this.map.has(sanitizeKey(key));
 
   public set = (key: string, value: HeaderValue) => {
-    const data = Array.isArray(value) ? value.map(sanitizeValue) : sanitizeValue(value);
+    const data = Array.isArray(value)
+      ? value.map(sanitizeValue)
+      : sanitizeValue(value);
     this.map.set(sanitizeKey(key), data);
   };
 

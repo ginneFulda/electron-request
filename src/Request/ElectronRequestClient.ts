@@ -91,7 +91,9 @@ class ElectronRequestClient implements RequestClient {
         clientRequest.end();
       } else if (requestBody instanceof Stream) {
         // TODO remove as
-        requestBody.pipe(new PassThrough()).pipe(clientRequest as unknown as Writable);
+        requestBody
+          .pipe(new PassThrough())
+          .pipe(clientRequest as unknown as Writable);
       } else {
         clientRequest.write(requestBody);
         clientRequest.end();
@@ -123,7 +125,9 @@ class ElectronRequestClient implements RequestClient {
           callback(username, password);
         } else {
           onRejected(
-            new Error(`Login event received from ${authInfo.host} but no credentials provided`),
+            new Error(
+              `Login event received from ${authInfo.host} but no credentials provided`,
+            ),
           );
         }
       });
@@ -141,12 +145,15 @@ class ElectronRequestClient implements RequestClient {
           }
 
           if (!headers.get(HEADER_MAP.LOCATION)) {
-            onRejected(new Error(`Redirect location header missing at: ${requestURL}`));
+            onRejected(
+              new Error(`Redirect location header missing at: ${requestURL}`),
+            );
           }
 
           if (
             statusCode === 303 ||
-            ((statusCode === 301 || statusCode === 302) && method === METHOD_MAP.POST)
+            ((statusCode === 301 || statusCode === 302) &&
+              method === METHOD_MAP.POST)
           ) {
             this.options.method = METHOD_MAP.GET;
             this.options.body = null;

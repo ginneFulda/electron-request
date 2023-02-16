@@ -5,21 +5,30 @@ import ElectronRequest from './ElectronRequestClient';
 import NativeRequest from './NativeRequestClient';
 import { DEFAULT_OPTIONS, SUPPORTED_COMPRESSIONS } from '@/constant';
 import { HEADER_MAP, METHOD_MAP } from '@/enum';
-import type { RequestConstructorOptions, RequestOptions, RequestClient } from '@/typings.d';
+import type {
+  RequestConstructorOptions,
+  RequestOptions,
+  RequestClient,
+} from '@/typings.d';
 
-const getRequestOptions = (constructorOptions: RequestConstructorOptions): RequestOptions => {
+const getRequestOptions = (
+  constructorOptions: RequestConstructorOptions,
+): RequestOptions => {
   const options = { ...DEFAULT_OPTIONS, ...constructorOptions };
 
   const method = options.method.toUpperCase();
   const { body, requestURL, query, headers: headerOptions } = options;
 
-  if (body !== null && (method === METHOD_MAP.GET || method === METHOD_MAP.HEAD)) {
+  if (
+    body !== null &&
+    (method === METHOD_MAP.GET || method === METHOD_MAP.HEAD)
+  ) {
     throw new TypeError('Request with GET/HEAD method cannot have body');
   }
 
   const parsedURL = new URL(requestURL);
   const { protocol, hostname, searchParams } = parsedURL;
-  if (!protocol || !hostname) {
+  if (!(protocol && hostname)) {
     throw new TypeError('Only absolute URLs are supported');
   }
   if (!/^https?:$/.test(protocol)) {
@@ -27,7 +36,10 @@ const getRequestOptions = (constructorOptions: RequestConstructorOptions): Reque
   }
   if (query) {
     for (const [queryKey, queryValue] of Object.entries(query)) {
-      searchParams.set(encodeURIComponent(queryKey), encodeURIComponent(queryValue));
+      searchParams.set(
+        encodeURIComponent(queryKey),
+        encodeURIComponent(queryValue),
+      );
     }
   }
 
@@ -66,7 +78,9 @@ class Request {
   constructor(constructorOptions: RequestConstructorOptions) {
     const options = getRequestOptions(constructorOptions);
     this.client =
-      !options.useNative && inElectron ? new ElectronRequest(options) : new NativeRequest(options);
+      !options.useNative && inElectron
+        ? new ElectronRequest(options)
+        : new NativeRequest(options);
   }
 
   public send = () => {
