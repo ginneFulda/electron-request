@@ -31,7 +31,6 @@ class ElectronRequestClient implements RequestClient {
     }
     await this.electronAdapter.whenReady();
     const {
-      requestURL,
       parsedURL: { protocol, host, hostname, port, pathname, origin, search },
       method,
       session,
@@ -41,8 +40,7 @@ class ElectronRequestClient implements RequestClient {
 
     const options = {
       method,
-      url: `${requestURL}${pathname}${search || ''}`,
-      // path: `${pathname}${search || ''}`,
+      path: `${pathname}${search || ''}`,
       session: session || this.electronAdapter.getDefaultSession(),
       useSessionCookies,
       protocol,
@@ -51,7 +49,6 @@ class ElectronRequestClient implements RequestClient {
       origin,
       port: Number(port),
     };
-    // console.log('options: ', options);
     const clientRequest = this.electronAdapter.request(options);
 
     for (const [key, value] of Object.entries(headers.raw())) {
