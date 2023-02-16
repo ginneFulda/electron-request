@@ -57,7 +57,7 @@
   },
   "lint-staged": {
     "**/*.{md,json}": "prettier --write",
-    "**/*.{js,ts}": [
+    "**/*.{js,mjs,ts}": [
       "rome check",
       "rome format --write"
     ]

@@ -1,9 +1,13 @@
-import isBuiltin from 'is-builtin-module';
-import typescript from 'rollup-plugin-typescript2';
-import typescriptPaths from 'rollup-plugin-typescript-paths';
-import { getBabelOutputPlugin } from '@rollup/plugin-babel';
+import { readFileSync } from 'fs';
 import dts from 'rollup-plugin-dts';
-import pkgConfig from './package.json';
+import external from 'is-builtin-module';
+import typescript from 'rollup-plugin-typescript2';
+import { getBabelOutputPlugin } from '@rollup/plugin-babel';
+import { typescriptPaths } from 'rollup-plugin-typescript-paths';
+
+const pkg = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+);
 
 const resolveTypescriptPaths = () =>
   typescriptPaths({
@@ -17,26 +21,19 @@ const getBabelPlugin = () =>
         '@babel/preset-env',
         {
           modules: false,
-          targets: '> 1%',
+          targets: 'defaults',
         },
       ],
     ],
   });
-
-const external = (id) => {
-  if (isBuiltin(id)) {
-    return true;
-  }
-  return Reflect.has(pkgConfig.dependencies || {}, id);
-};
 
 export default [
   {
     input: 'src/index.ts',
     plugins: [resolveTypescriptPaths(), typescript(), getBabelPlugin()],
     output: [
-      { file: pkgConfig.module, format: 'es' },
-      { file: pkgConfig.main, format: 'cjs', exports: 'auto' },
+      { file: pkg.module, format: 'es' },
+      { file: pkg.main, format: 'cjs', exports: 'auto' },
     ],
     external,
   },
@@ -51,7 +48,7 @@ export default [
         },
       }),
     ],
-    output: [{ file: pkgConfig.types, format: 'es' }],
-    external: (id) => isBuiltin(id),
+    output: [{ file: pkg.types, format: 'es' }],
+    external,
   },
 ];
