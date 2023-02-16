@@ -18,15 +18,16 @@ const getRequestOptions = (constructorOptions: RequestConstructorOptions): Reque
   }
 
   const parsedURL = new URL(requestURL);
-  if (!parsedURL.protocol || !parsedURL.hostname) {
+  const { protocol, hostname, searchParams } = parsedURL;
+  if (!protocol || !hostname) {
     throw new TypeError('Only absolute URLs are supported');
   }
-  if (!/^https?:$/.test(parsedURL.protocol)) {
+  if (!/^https?:$/.test(protocol)) {
     throw new TypeError('Only HTTP(S) protocols are supported');
   }
   if (query) {
     for (const [queryKey, queryValue] of Object.entries(query)) {
-      parsedURL.searchParams.append(queryKey, queryValue);
+      searchParams.set(encodeURIComponent(queryKey), encodeURIComponent(queryValue));
     }
   }
 
