@@ -112,6 +112,12 @@ export default class implements Response {
     return statusCode >= 200 && statusCode < 300;
   }
 
+  /** Response status code */
+  get statusCode(): number {
+    const { statusCode } = this.config;
+    return statusCode;
+  }
+
   get headers() {
     return this.config.headers.raw();
   }

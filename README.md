@@ -129,6 +129,8 @@ void (async () => {
 interface Response {
   /** Whether the response was successful (status in the range 200-299) */
   ok: boolean;
+  /** Response status code */
+  statusCode: number;
   /** Response headers */
   headers: Record<string, string | string[]>;
   /** Return origin stream */
