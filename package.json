@@ -33,6 +33,7 @@
   "scripts": {
     "dev": "rollup -c --watch",
     "build": "rollup -c",
+    "prepare": "simple-git-hooks",
     "release": "npm run build && standard-version"
   },
   "devDependencies": {
